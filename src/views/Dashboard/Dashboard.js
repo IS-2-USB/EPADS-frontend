@@ -26,6 +26,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
 import styles from "./dashboard.module.scss";
+import SearchBar from "../../searchBar";
 const drawerWidth = 200;
 
 export default function Dashboard() {
@@ -43,6 +44,7 @@ export default function Dashboard() {
     <>
       <div className={styles.container}>
         <h1>Proyectos</h1>
+        <SearchBar />
         <div>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
