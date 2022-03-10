@@ -11,7 +11,7 @@ const SearchBar = () => {
                 label="Buscar"
             />
             <Button variant="outlined">
-                <SearchIcon />
+                <SearchIcon style={{color : "black"}}/>
             </Button>
         </form>
     );
