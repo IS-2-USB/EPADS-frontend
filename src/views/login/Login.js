@@ -40,6 +40,7 @@ export default function Login() {
     const handleSubmit = async (event) =>{
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+        console.log(data.get("username"))
         if((data.get("username") === "") || (data.get("password") === "")){
           alert("Rellene los campos de usuario y contraseña")
         }
