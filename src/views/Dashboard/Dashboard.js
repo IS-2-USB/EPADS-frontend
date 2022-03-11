@@ -51,9 +51,9 @@ export default function Dashboard() {
               <TableHead>
                 <TableRow>
                   <TableCell>Id </TableCell>
-                  <TableCell align="center">descripcion</TableCell>
-                  <TableCell align="center">tipo</TableCell>
-                  <TableCell align="center">acciones</TableCell>
+                  <TableCell align="center">Descripcion</TableCell>
+                  <TableCell align="center">Tipo</TableCell>
+                  <TableCell align="center">Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

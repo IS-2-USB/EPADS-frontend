@@ -9,8 +9,10 @@ const SearchBar = () => {
                 id="outlined-basic"
                 variant="outlined"
                 label="Buscar"
+                size="small"
+
             />
-            <Button variant="outlined">
+            <Button variant="outlined"  >
                 <SearchIcon style={{color : "black"}}/>
             </Button>
         </form>
