@@ -12,6 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
 
 function Copyright(props) {
   return (
@@ -29,6 +30,7 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
+  const router = useNavigate()
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -37,6 +39,7 @@ export default function SignUp() {
       email: data.get('email'),
       password: data.get('password'),
     });
+    router("/")
   };
 
   return (
@@ -66,7 +69,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="firstName"
-                  label="First Name"
+                  label="Nombre"
                   autoFocus
                 />
               </Grid>
@@ -75,7 +78,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="lastName"
-                  label="Last Name"
+                  label="Apellido"
                   name="lastName"
                   autoComplete="family-name"
                 />
@@ -84,10 +87,10 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
+                  id="username"
+                  label="Nombre de usuario"
+                  name="username"
+                  autoComplete="username"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -95,16 +98,21 @@ export default function SignUp() {
                   required
                   fullWidth
                   name="password"
-                  label="Password"
+                  label="Contraseña"
                   type="password"
                   id="password"
                   autoComplete="new-password"
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
+                <TextField
+                  required
+                  fullWidth
+                  name="repeatPassword"
+                  label="Repita la contraseña"
+                  type="repeatPassword"
+                  id="repeatPassword"
+                  autoComplete="repeatPassword"
                 />
               </Grid>
             </Grid>
@@ -114,12 +122,12 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Registrarse
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
-                  Already have an account? Sign in
+                <Link href="/" variant="body2">
+                  ¿Ya tienes una cuenta? Inicia sesión
                 </Link>
               </Grid>
             </Grid>

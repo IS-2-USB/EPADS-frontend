@@ -26,10 +26,13 @@ import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
 import styles from "./UserControl.scss";
+import { useNavigate } from "react-router-dom";
+
 const drawerWidth = 200;
 
 export default function UserControl() {
     const [editable, setEditable] = useState(null);
+    const router = useNavigate();
     const createData = (
         id,
         login,
@@ -74,6 +77,11 @@ export default function UserControl() {
             projects[0]
         ),
     ];
+    function dash(){
+        console.log("entre")
+        
+        router("/dashboard");
+      }
     return (
         <>
             <div className={styles.container}>
@@ -277,7 +285,7 @@ export default function UserControl() {
                         { name: "Usuarios", icon: <PeopleIcon /> },
                         { name: "Eventos", icon: <EventNoteIcon /> },
                     ].map(({ name, icon }, index) => (
-                        <ListItem button key={name}>
+                        <ListItem button onClick={() => dash()} key={name}>
                             <ListItemIcon>{icon}</ListItemIcon>
                             <ListItemText primary={name} />
                         </ListItem>
