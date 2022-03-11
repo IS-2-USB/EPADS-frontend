@@ -43,6 +43,20 @@ export default function Login() {
     if (data.get("username") === "" || data.get("password") === "") {
       alert("Rellene los campos de usuario y contraseña");
     }
+    else{
+      dispatch({
+        type: "login",
+        payload: {
+          first_name: "Carlos",
+          last_name: "Gonzalez",
+          type: "developer",
+          token: "jskdf9s82342js09",
+          isLoading: false,
+        },
+      });
+      router("/dashboard");
+      alert("Bienvenido");
+    }
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -58,18 +72,7 @@ export default function Login() {
     ); */
     /*  const data2 = await response.json(); */
     /*     if (result.ok) { */
-    dispatch({
-      type: "login",
-      payload: {
-        first_name: "Carlos",
-        last_name: "Gonzalez",
-        type: "developer",
-        token: "jskdf9s82342js09",
-        isLoading: false,
-      },
-    });
-    router("/dashboard");
-    alert("Bienvenido");
+    
     /*   } else {
       alert("no se encuentra registrado en el sistema");
     } */
@@ -151,7 +154,7 @@ export default function Login() {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="/Dashboard" variant="body2">
+                <Link href="/" variant="body2">
                   Cambiar contraseña
                 </Link>
               </Grid>

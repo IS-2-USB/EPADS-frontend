@@ -12,6 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
 
 function Copyright(props) {
   return (
@@ -29,6 +30,7 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
+  const router = useNavigate()
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -37,6 +39,7 @@ export default function SignUp() {
       email: data.get('email'),
       password: data.get('password'),
     });
+    router("/")
   };
 
   return (
@@ -102,9 +105,14 @@ export default function SignUp() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
+                <TextField
+                  required
+                  fullWidth
+                  name="repeatPassword"
+                  label="Repita la contraseña"
+                  type="repeatPassword"
+                  id="repeatPassword"
+                  autoComplete="repeatPassword"
                 />
               </Grid>
             </Grid>
@@ -114,11 +122,11 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Registrarse
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/" variant="body2">
                   ¿Ya tienes una cuenta? Inicia sesión
                 </Link>
               </Grid>

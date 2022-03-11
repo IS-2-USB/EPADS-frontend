@@ -26,10 +26,12 @@ import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
 import styles from "./dashboard.module.scss";
+import { useNavigate } from "react-router-dom";
 const drawerWidth = 200;
 
 export default function Dashboard() {
   const [editable, setEditable] = useState(null);
+  const router = useNavigate();
   const createData = (id, descripcion, tipo, acciones) => {
     return { id, descripcion, tipo, acciones };
   };
@@ -39,6 +41,12 @@ export default function Dashboard() {
     createData(2, "Proyecto 2", "Ninguno"),
     createData(3, "Proyecto 3", "Ninguno"),
   ];
+
+  function user(){
+    console.log("entre")
+    
+    router("/users");
+  }
   return (
     <>
       <div className={styles.container}>
@@ -129,7 +137,7 @@ export default function Dashboard() {
             { name: "Usuarios", icon: <PeopleIcon /> },
             { name: "Eventos", icon: <EventNoteIcon /> },
           ].map(({ name, icon }, index) => (
-            <ListItem button key={name}>
+            <ListItem button onClick={() => user()} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>
               <ListItemText primary={name} />
             </ListItem>
