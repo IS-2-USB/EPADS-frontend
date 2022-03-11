@@ -26,6 +26,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
 import styles from "./dashboard.module.scss";
+import SearchBar from "../../searchBar";
 import { useNavigate } from "react-router-dom";
 const drawerWidth = 200;
 
@@ -51,15 +52,16 @@ export default function Dashboard() {
     <>
       <div className={styles.container}>
         <h1>Proyectos</h1>
+        <SearchBar />
         <div>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650, }} aria-label="simple table">
               <TableHead>
                 <TableRow>
                   <TableCell>Id </TableCell>
-                  <TableCell align="center">descripcion</TableCell>
-                  <TableCell align="center">tipo</TableCell>
-                  <TableCell align="center">acciones</TableCell>
+                  <TableCell align="center">Descripcion</TableCell>
+                  <TableCell align="center">Tipo</TableCell>
+                  <TableCell align="center">Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
