@@ -1,0 +1,21 @@
+@import "../../variables.scss";
+
+.container {
+  //   max-height: 100vh;
+  //   overflow: hidden;
+  padding-top: 2rem;
+  padding-right: 8rem;
+  padding-left: calc(#{$sidebar-width} + 100px);
+}
+
+.select {
+  width: 80%;
+  height: 100%;
+  text-align: left;
+}
+
+.icons_row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
