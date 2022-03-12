@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const BASE_URL = "http:localhost:5000";
+
 export async function fetchService({
   url,
   method = "GET",
@@ -8,7 +10,7 @@ export async function fetchService({
 }) {
   try {
     const objectRequest = {
-      url,
+      url: BASE_URL + url,
       method,
       data: params,
       headers: {
