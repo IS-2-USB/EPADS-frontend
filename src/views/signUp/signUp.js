@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from "react-router-dom";
+import {fetchService} from "../../services/api"
 
 function Copyright(props) {
   return (
@@ -31,15 +32,39 @@ const theme = createTheme();
 
 export default function SignUp() {
   const router = useNavigate()
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-    router("/")
+    if ((data.get("firstName") || data.get("lastName") || data.get("username") || data.get("password")
+       || data.get("repeatPassword") )=== "") 
+    {
+      alert("Rellene los campos de usuario y contraseña");
+    }
+    else{
+      const requestOptions = {
+        url: "/user/register",
+        params: 
+          JSON.stringify({
+            username: data.get("username"),
+            first_name: data.get("lastName"),
+            last_name: data.get("lastName"),
+            role: "Scrum Team",
+            password: data.get("password"),
+          }),
+        method: "POST",
+        token: "",
+      };
+      console.log(requestOptions);
+      const response = await fetchService(requestOptions);
+  
+      if (response.ok) {
+        console.log(response);
+        alert("Registro exitoso, ahora puedes iniciar sesión");
+        router("/");
+      } else {
+        alert("Error, por favor verifica los datos e intentalo nuevamente");
+      }
+    }
   };
 
   return (
@@ -110,7 +135,7 @@ export default function SignUp() {
                   fullWidth
                   name="repeatPassword"
                   label="Repita la contraseña"
-                  type="repeatPassword"
+                  type="password"
                   id="repeatPassword"
                   autoComplete="repeatPassword"
                 />
