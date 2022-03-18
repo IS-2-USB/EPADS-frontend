@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography";
 import { useAuth } from "../../context/authContext";
 import styles from "./login.module.scss";
 import { useNavigate } from "react-router-dom";
+import {fetchService} from "../../services/api"
 
 function Copyright(props) {
   return (
@@ -44,38 +45,36 @@ export default function Login() {
       alert("Rellene los campos de usuario y contraseña");
     }
     else{
-      dispatch({
-        type: "login",
-        payload: {
-          first_name: "Carlos",
-          last_name: "Gonzalez",
-          type: "developer",
-          token: "jskdf9s82342js09",
-          isLoading: false,
-        },
-      });
-      router("/dashboard");
-      alert("Bienvenido");
+      const requestOptions = {
+        url: "/user/login",
+        params: 
+          JSON.stringify({
+            username: data.get("username"),
+            password: data.get("password"),
+          }),
+        method: "POST",
+        token: "",
+      };
+      const response = await fetchService(requestOptions)
+  
+      if (response.ok) {
+        console.log(response)
+        dispatch({
+          type: "login",
+          payload: {
+            first_name: "Carlos",
+            last_name: "Gonzalez",
+            type: "developer",
+            token: "jskdf9s82342js09",
+            isLoading: false,
+          },
+        });
+        alert("Hola de nuevo "+ data.get("username"))
+        router("/dashboard");
+      } else {
+        alert("no se encuentra registrado en el sistema");
+      }
     }
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: data.get("username"),
-        password: data.get("password"),
-      }),
-    };
-
-    /* const response = await fetch(
-      "http://localhost:5000/user/login",
-      requestOptions
-    ); */
-    /*  const data2 = await response.json(); */
-    /*     if (result.ok) { */
-    
-    /*   } else {
-      alert("no se encuentra registrado en el sistema");
-    } */
   };
 
   return (
