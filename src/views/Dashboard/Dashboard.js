@@ -28,11 +28,13 @@ import SaveIcon from "@mui/icons-material/Save";
 import styles from "./dashboard.module.scss";
 import SearchBar from "../../searchBar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/authContext";
 const drawerWidth = 200;
 
 export default function Dashboard() {
   const [editable, setEditable] = useState(null);
   const router = useNavigate();
+
   const createData = (id, descripcion, tipo, acciones) => {
     return { id, descripcion, tipo, acciones };
   };
@@ -43,9 +45,9 @@ export default function Dashboard() {
     createData(3, "Proyecto 3", "Ninguno"),
   ];
 
-  function user(){
-    console.log("entre")
-    
+  function user() {
+    console.log("entre");
+
     router("/users");
   }
   return (
@@ -55,7 +57,7 @@ export default function Dashboard() {
         <SearchBar />
         <div>
           <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650, }} aria-label="simple table">
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
                 <TableRow>
                   <TableCell>Id </TableCell>

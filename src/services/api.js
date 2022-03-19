@@ -12,21 +12,17 @@ export async function fetchService({
     const objectRequest = {
       url: BASE_URL + url,
       method,
-      body: params,
+      data: params,
       headers: {
         "Content-Type": "application/json",
       },
     };
     if (token) objectRequest.headers["Authorization"] = `Bearer ${token}`;
 
-    //const response = await axios(objectRequest);
-    const response = await fetch(
-      objectRequest.url,
-      objectRequest
-    )
-    console.log(response)
+    const response = await axios(objectRequest);
     return response;
   } catch (e) {
+    console.log(e);
     return e;
   }
 }

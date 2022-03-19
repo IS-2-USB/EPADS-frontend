@@ -14,7 +14,7 @@ import Typography from "@mui/material/Typography";
 import { useAuth } from "../../context/authContext";
 import styles from "./login.module.scss";
 import { useNavigate } from "react-router-dom";
-import {fetchService} from "../../services/api"
+import { fetchService } from "../../services/api";
 
 function Copyright(props) {
   return (
@@ -43,33 +43,29 @@ export default function Login() {
 
     if (data.get("username") === "" || data.get("password") === "") {
       alert("Rellene los campos de usuario y contraseña");
-    }
-    else{
+    } else {
       const requestOptions = {
         url: "/user/login",
-        params: 
-          JSON.stringify({
-            username: data.get("username"),
-            password: data.get("password"),
-          }),
+        params: JSON.stringify({
+          username: data.get("username"),
+          password: data.get("password"),
+        }),
         method: "POST",
-        token: "",
       };
-      const response = await fetchService(requestOptions)
-  
-      if (response.ok) {
-        console.log(response)
+      const response = await fetchService(requestOptions);
+
+      if (response.status == 200) {
         dispatch({
           type: "login",
           payload: {
-            first_name: "Carlos",
-            last_name: "Gonzalez",
-            type: "developer",
-            token: "jskdf9s82342js09",
+            first_name: response.data.first_name,
+            last_name: response.data.last_name,
+            type: response.data.role,
+            token: response.data.access_token,
             isLoading: false,
           },
         });
-        alert("Hola de nuevo "+ data.get("username"))
+        alert("Hola de nuevo " + data.get("username"));
         router("/dashboard");
       } else {
         alert("no se encuentra registrado en el sistema");
