@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Button,
+  Dialog,
+  DialogTitle,
   Divider,
   Drawer,
   FormControl,
@@ -8,6 +11,7 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
+  Pagination,
   Paper,
   Select,
   Table,
@@ -16,6 +20,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Toolbar,
 } from "@mui/material";
 import PanToolIcon from "@mui/icons-material/PanTool";
@@ -28,34 +33,102 @@ import SaveIcon from "@mui/icons-material/Save";
 import styles from "./dashboard.module.scss";
 import SearchBar from "../../searchBar";
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { fetchService } from "../../services/api";
+import { useAuth } from "../../context/authContext";
 const drawerWidth = 200;
 
 export default function Dashboard() {
+  const { state } = useAuth();
+  const [currentPage, setCurrenPage] = useState(1);
+  const [pageCount, setPageCount] = useState(0);
+  const queryClient = useQueryClient();
   const [editable, setEditable] = useState(null);
+  const [description, setDescription] = useState();
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [projects, setProjects] = useState([]);
   const router = useNavigate();
-  const createData = (id, descripcion, tipo, acciones) => {
-    return { id, descripcion, tipo, acciones };
-  };
+  const { data } = useQuery("projects", () =>
+    fetchService({ url: `/projects/getall/${state.id || 1}` })
+  );
+  useEffect(() => {
+    if (data) {
+      const startData = (currentPage - 1) * 5;
+      const endData = startData + 5;
+      setPageCount(Math.ceil(data.length / 5));
+      setProjects(data.reverse().slice(startData, endData));
+    }
+  }, [data, currentPage]);
+  const { mutate } = useMutation(
+    (values) => {
+      return fetchService({
+        url: "/projects/add",
+        params: { description: values.description, user_id: state.id || 1 },
+        method: "POST",
+        token: "",
+      });
+    },
+    {
+      onSuccess: () => {
+        closeModal();
+        queryClient.invalidateQueries("projects");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
 
-  const rows = [
-    createData(1, "Proyecto 1", "Ninguno"),
-    createData(2, "Proyecto 2", "Ninguno"),
-    createData(3, "Proyecto 3", "Ninguno"),
-  ];
-
-  function user(){
-    console.log("entre")
-    
+  function user() {
     router("/users");
   }
+
+  const createProject = () => {
+    mutate({ description });
+  };
+
+  const handleOnChangeDescription = (e) => {
+    setDescription(e.target.value);
+  };
+
+  const closeModal = () => {
+    setIsOpenModal(false);
+  };
   return (
     <>
       <div className={styles.container}>
         <h1>Proyectos</h1>
-        <SearchBar />
+        <Dialog open={isOpenModal} onClose={closeModal}>
+          <DialogTitle>Crear nuevo proyecto</DialogTitle>
+          <div className={styles.form}>
+            <TextField
+              label="Descripcion"
+              onChange={handleOnChangeDescription}
+              onKeyDown={(e) => {
+                e.key === "Enter" && createProject();
+              }}
+            />
+          </div>
+          <div className={styles.controls}>
+            <Button variant="outlined" onClick={closeModal}>
+              Cancelar
+            </Button>
+            <Button variant="contained" onClick={createProject}>
+              Crear
+            </Button>
+          </div>
+        </Dialog>
+        <div className={styles.header}>
+          <SearchBar />
+          <Button
+            variant="outlined"
+            className={styles["header__button"]}
+            onClick={() => setIsOpenModal(true)}
+          >
+            Crear proyecto
+          </Button>
+        </div>
         <div>
           <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650, }} aria-label="simple table">
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
                 <TableRow>
                   <TableCell>Id </TableCell>
@@ -65,7 +138,7 @@ export default function Dashboard() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
+                {projects.map((row) => (
                   <TableRow
                     key={row.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -73,7 +146,7 @@ export default function Dashboard() {
                     <TableCell component="th" scope="row">
                       {row.id}
                     </TableCell>
-                    <TableCell align="center">{row.descripcion}</TableCell>
+                    <TableCell align="center">{row.description}</TableCell>
                     <TableCell align="center">
                       {editable === row.id ? (
                         <FormControl className={styles.select}>
@@ -82,6 +155,7 @@ export default function Dashboard() {
                             id="demo-simple-select"
                             value={10}
                             style={{ height: "40px" }}
+                            variant="standard"
                             // onChange={handleChange}
                           >
                             <MenuItem value={10}>Ten</MenuItem>
@@ -90,7 +164,7 @@ export default function Dashboard() {
                           </Select>
                         </FormControl>
                       ) : (
-                        row.tipo
+                        "Tipo"
                       )}
                     </TableCell>
                     <TableCell align="center">
@@ -117,6 +191,12 @@ export default function Dashboard() {
               </TableBody>
             </Table>
           </TableContainer>
+          <div className={styles.paginationContainer}>
+            <Pagination
+              count={pageCount}
+              onChange={(_, page) => setCurrenPage(page)}
+            />
+          </div>
         </div>
       </div>
       <Drawer

@@ -17,6 +17,7 @@ const manageAuth = (state, result) => {
     first_name: result.first_name,
     last_name: result.last_name,
     token: result.token,
+    id: result.id,
     isLoading: false,
   };
 };
@@ -26,6 +27,7 @@ const manageInfo = (state, result) => {
     first_name: result.first_name,
     last_name: result.last_name,
     type: result.type,
+    id: result.id,
     isLoggedIn: true,
     isLoading: false,
   };

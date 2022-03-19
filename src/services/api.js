@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://localhost:4200";
 
 export async function fetchService({
   url,
@@ -9,22 +9,24 @@ export async function fetchService({
   token = "",
 }) {
   try {
-    const objectRequest = {
+    let objectRequest = {
       url: BASE_URL + url,
       method,
-      body: params,
       headers: {
         "Content-Type": "application/json",
       },
     };
+
+    if (method !== "GET") {
+      objectRequest = { ...objectRequest, body: JSON.stringify(params) };
+    }
+
     if (token) objectRequest.headers["Authorization"] = `Bearer ${token}`;
 
-    //const response = await axios(objectRequest);
-    const response = await fetch(
-      objectRequest.url,
-      objectRequest
-    )
-    console.log(response)
+    const response = await fetch(objectRequest.url, objectRequest).then(
+      (resp) => resp.json()
+    );
+
     return response;
   } catch (e) {
     return e;

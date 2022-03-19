@@ -9,30 +9,36 @@ import { ThemeProvider } from "@emotion/react";
 import { createTheme } from "@mui/material";
 import PrivateRoute from "./auth/PrivateRoute";
 import React from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
 const theme = createTheme();
 
 function App() {
+  const queryClient = new QueryClient();
   return (
-    <AuthProvider>
-      <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <Routes>
-            <Route exact path="/" element={<Login />} />
-            <Route exact path="/sign-up" element={<SignUp />} />
-            <Route
-              exact
-              path="/dashboard"
-              element={<PrivateRoute redirectTo="/" Component={Dashboard} />}
-            />
-            <Route
-              exact
-              path="/users"
-              element={<PrivateRoute redirectTo="/" Component={UserControl} />}
-            />
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <BrowserRouter>
+            <Routes>
+              <Route exact path="/" element={<Login />} />
+              <Route exact path="/sign-up" element={<SignUp />} />
+              <Route
+                exact
+                path="/dashboard"
+                element={<PrivateRoute redirectTo="/" Component={Dashboard} />}
+              />
+              <Route
+                exact
+                path="/users"
+                element={
+                  <PrivateRoute redirectTo="/" Component={UserControl} />
+                }
+              />
+            </Routes>
+          </BrowserRouter>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
