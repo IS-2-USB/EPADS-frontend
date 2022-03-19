@@ -51,7 +51,6 @@ export default function Login() {
           password: data.get("password"),
         },
         method: "POST",
-        token: "",
       };
       const user = await fetchService(requestOptions);
 
@@ -60,16 +59,16 @@ export default function Login() {
         dispatch({
           type: "login",
           payload: {
-            first_name: "Carlos",
-            last_name: "Gonzalez",
-            type: "developer",
-            token: "jskdf9s82342js09",
+            first_name: user.first_name,
+            last_name: user.last_name,
+            type: user.role,
+            token: user.access_token,
             id: user.id,
             isLoading: false,
           },
         });
         alert("Hola de nuevo " + data.get("username"));
-        router("/dashboard");
+        router("dashboard");
       } else {
         alert("no se encuentra registrado en el sistema");
       }

@@ -18,6 +18,7 @@ const manageAuth = (state, result) => {
     last_name: result.last_name,
     token: result.token,
     id: result.id,
+    type: result.type,
     isLoading: false,
   };
 };

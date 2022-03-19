@@ -59,12 +59,10 @@ export default function SignUp() {
           password: data.get("password"),
         },
         method: "POST",
-        token: "",
       };
       const response = await fetchService(requestOptions);
 
       if (response.id) {
-        console.log(response);
         alert("Registro exitoso, ahora puedes iniciar sesión");
         router("/");
       } else {
