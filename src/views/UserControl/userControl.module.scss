@@ -4,8 +4,14 @@
   //   max-height: 100vh;
   //   overflow: hidden;
   padding-top: 2rem;
-  padding-right: 8rem;
-  padding-left: calc(#{$sidebar-width} + 100px);
+  padding-right: 5px;
+  padding-left: 105px;
+  .header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 
 .select {

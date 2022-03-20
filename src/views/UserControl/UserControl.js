@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Divider,
     Drawer,
@@ -25,89 +25,151 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
-import styles from "./UserControl.scss";
+import styles from "./userControl.module.scss";
 import { useNavigate } from "react-router-dom";
+import { Users } from "../../api/resources/users";
+import { Projects } from "../../api/resources/projects";
+import SearchBar from "../../searchBar";
 
 const drawerWidth = 200;
 
 export default function UserControl() {
     const [editable, setEditable] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [editableRole, setEditableRole] = useState("");
+    const [editableProjects, setEditableProjects] = useState({
+        project1: "",
+        project2: "",
+    });
+    const [rows, setRows] = useState([]);
+    const [change, setChange] = useState(false);
+
+    const filteredRows = [];
+
     const router = useNavigate();
+
     const createData = (
         id,
         login,
         name,
         lastname,
         role,
-        projects1,
-        projects2
+        project1,
+        project2,
+        projects
     ) => {
-        return { id, login, name, lastname, role, projects1, projects2 };
+        return {
+            id,
+            login,
+            name,
+            lastname,
+            role,
+            project1,
+            project2,
+            projects,
+        };
     };
-    const projects = ["Proyecto 1", "Proyecto 2", "Proyecto 3", "Proyecto 4"];
 
-    const roles = ["Product Owner", "Scrum Master", "Developer"];
+    const roles = ["Product Owner", "Scrum Master", "Scrum Team"];
 
-    const rows = [
-        createData(
-            1,
-            "juanperez",
-            "Juan",
-            "Perez",
-            roles[0],
-            projects[0],
-            projects[2]
-        ),
-        createData(
-            2,
-            "juanperez",
-            "Juan",
-            "Perez",
-            roles[1],
-            projects[2],
-            projects[1]
-        ),
-        createData(
-            3,
-            "juanperez",
-            "Juan",
-            "Perez",
-            roles[0],
-            projects[3],
-            projects[0]
-        ),
-    ];
-    function dash(){
-        console.log("entre")
-        
+    function dash() {
+        console.log("entre");
+
         router("/dashboard");
-      }
+    }
+
+    const editUser = async ({ username, new_role }) => {
+        await Users.edit({ username, new_role });
+        setChange(!change);
+    };
+
+    const deleteUser = async (username) => {
+        await Users.remove(username);
+        setChange(!change);
+        setEditable(false);
+    };
+
+    const onChangeRole = (event) => setEditableRole(event.target.value);
+
+    const onChangeProject1 = (event) => {
+        const project1 = event.target.value;
+        setEditableProjects({ ...editableProjects, project1 });
+    };
+
+    const onChangeProject2 = (event) => {
+        const project2 = event.target.value;
+        setEditableProjects({ ...editableProjects, project2 });
+    };
+
+    const onEditClick = ({ id, project1, project2, role }) => {
+        setEditable(id);
+        setEditableRole(role);
+        setEditableProjects({ project1, project2 });
+    };
+
+    const onSaveClick = ({ username, new_role }) => {
+        editUser({ username, new_role });
+        setEditable(false);
+    };
+
+    useEffect(async () => {
+        const projectsReponse = await Projects.getAll();
+        setProjects(projectsReponse.map((project) => project.description));
+
+        let rowsGetted = [];
+        const usersResponse = await Users.getAll();
+        usersResponse.map((user) => {
+            const userProjects = projectsReponse
+                .filter((project) => project.user_id == user.id)
+                .map((project) => project.description);
+            const project1 = userProjects.length > 0 ? userProjects[0] : "";
+            const project2 = userProjects.length > 1 ? userProjects[1] : "";
+            rowsGetted.push(
+                createData(
+                    user.id,
+                    user.username,
+                    user.first_name,
+                    user.last_name,
+                    user.role,
+                    project1,
+                    project2,
+                    userProjects
+                )
+            );
+        });
+        setRows(rowsGetted);
+    }, [change]);
+
     return (
-        <>
+        <div className={styles.container}>
             <div className={styles.container}>
                 <h1>Usuarios</h1>
+                <div className={styles.header}>
+                    <SearchBar />
+                </div>
                 <div>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                            
                             <TableHead>
                                 <TableRow>
-                                    <TableCell style={{width: "10%"}}>Id </TableCell>
-                                    <TableCell align="center" style={{width: "12.5%"}}>
+                                    <TableCell>Id </TableCell>
+                                    <TableCell align="center">
                                         Usuario
                                     </TableCell>
-                                    <TableCell align="center" style={{width: "12.5%"}}>Nombre</TableCell>
-                                    <TableCell align="center" style={{width: "12.5%"}}>
+                                    <TableCell align="center">Nombre</TableCell>
+                                    <TableCell align="center">
                                         Apellido
                                     </TableCell>
-                                    <TableCell align="center" style={{width: "12.5%"}}>Rol</TableCell>
-                                    <TableCell align="center" style={{width: "12.5%"}}>
+                                    <TableCell align="center">Rol</TableCell>
+                                    <TableCell align="center">
                                         Proyecto 1
                                     </TableCell>
-                                    <TableCell align="center" style={{width: "12.5%"}}>
+                                    <TableCell align="center">
                                         Proyecto 2
                                     </TableCell>
-                                    <TableCell align="center" style={{width: "15%"}}>Acciones</TableCell>
+                                    <TableCell align="center">
+                                        Acciones
+                                    </TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -139,11 +201,11 @@ export default function UserControl() {
                                                     <Select
                                                         labelId="demo-simple-select-label"
                                                         id="demo-simple-select"
-                                                        value={row.role}
+                                                        value={editableRole}
                                                         style={{
                                                             height: "40px",
                                                         }}
-                                                        // onChange={handleChange}
+                                                        onChange={onChangeRole}
                                                     >
                                                         {roles.map((role) => (
                                                             <MenuItem
@@ -167,13 +229,17 @@ export default function UserControl() {
                                                     <Select
                                                         labelId="demo-simple-select-label"
                                                         id="demo-simple-select"
-                                                        value={row.projects1}
+                                                        value={
+                                                            editableProjects.project1
+                                                        }
                                                         style={{
                                                             height: "40px",
                                                         }}
-                                                        // onChange={handleChange}
+                                                        onChange={
+                                                            onChangeProject1
+                                                        }
                                                     >
-                                                        {projects.map(
+                                                        {row.projects.map(
                                                             (project) => (
                                                                 <MenuItem
                                                                     key={
@@ -190,7 +256,7 @@ export default function UserControl() {
                                                     </Select>
                                                 </FormControl>
                                             ) : (
-                                                row.projects1
+                                                row.project1
                                             )}
                                         </TableCell>
                                         <TableCell align="center">
@@ -201,13 +267,17 @@ export default function UserControl() {
                                                     <Select
                                                         labelId="demo-simple-select-label"
                                                         id="demo-simple-select"
-                                                        value={row.projects2}
+                                                        value={
+                                                            editableProjects.project2
+                                                        }
                                                         style={{
                                                             height: "40px",
                                                         }}
-                                                        // onChange={handleChange}
+                                                        onChange={
+                                                            onChangeProject2
+                                                        }
                                                     >
-                                                        {projects.map(
+                                                        {row.projects.map(
                                                             (project) => (
                                                                 <MenuItem
                                                                     key={
@@ -224,20 +294,32 @@ export default function UserControl() {
                                                     </Select>
                                                 </FormControl>
                                             ) : (
-                                                row.projects2
+                                                row.project2
                                             )}
                                         </TableCell>
                                         <TableCell align="center">
                                             <div className={styles.icons_row}>
-                                                <PanToolIcon />
                                                 <div
-                                                    onClick={() =>
-                                                        setEditable(row.id)
-                                                    }
+                                                    onClick={() => {
+                                                        onEditClick({
+                                                            id: row.id,
+                                                            project1:
+                                                                row.project1,
+                                                            project2:
+                                                                row.project2,
+                                                            role: row.role,
+                                                        });
+                                                    }}
                                                 >
                                                     <EditIcon />
                                                 </div>
-                                                <DeleteIcon />
+                                                <div
+                                                    onClick={() =>
+                                                        deleteUser(row.login)
+                                                    }
+                                                >
+                                                    <DeleteIcon />
+                                                </div>
                                                 <div
                                                     style={{
                                                         cursor: "pointer",
@@ -247,7 +329,10 @@ export default function UserControl() {
                                                                 : "hidden",
                                                     }}
                                                     onClick={() =>
-                                                        setEditable(false)
+                                                        onSaveClick({
+                                                            username: row.login,
+                                                            new_role: editableRole,
+                                                        })
                                                     }
                                                 >
                                                     <SaveIcon
@@ -292,6 +377,6 @@ export default function UserControl() {
                     ))}
                 </List>
             </Drawer>
-        </>
+        </div>
     );
 }
