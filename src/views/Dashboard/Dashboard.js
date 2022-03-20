@@ -6,6 +6,7 @@ import {
   Divider,
   Drawer,
   FormControl,
+  InputLabel,
   List,
   ListItem,
   ListItemIcon,
@@ -25,6 +26,7 @@ import {
 } from "@mui/material";
 import PanToolIcon from "@mui/icons-material/PanTool";
 import EditIcon from "@mui/icons-material/Edit";
+import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -45,25 +47,113 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const [editable, setEditable] = useState(null);
   const [description, setDescription] = useState();
+  const [type, setType] = useState("Ninguno");
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const [projects, setProjects] = useState([]);
   const router = useNavigate();
   const { data } = useQuery("projects", () =>
     fetchService({ url: `/projects/getall/${state.id || 1}` })
   );
+
   useEffect(() => {
     if (data) {
+      let filterData = data;
+      if (searchValue) {
+        filterData = data.filter((project) =>
+          project.description
+            .toLowerCase()
+            .includes(searchValue.toLocaleLowerCase())
+        );
+      }
       const startData = (currentPage - 1) * 5;
       const endData = startData + 5;
-      setPageCount(Math.ceil(data.length / 5));
-      setProjects(data.reverse().slice(startData, endData));
+      setPageCount(Math.ceil(filterData.length / 5));
+      setProjects(filterData.reverse().slice(startData, endData));
     }
-  }, [data, currentPage]);
+  }, [data, currentPage, searchValue]);
+
+  const onSearch = ({ target }) => {
+    setSearchValue(target.value);
+  };
+
+  const { mutate: deleteProjectMutation } = useMutation(
+    (id) => {
+      return fetchService({
+        url: `/projects/delete/${id}`,
+        method: "DELETE",
+        token: "",
+      });
+    },
+
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("projects");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
+  const { mutate: updateProjectMutation } = useMutation(
+    ({ id, description }) => {
+      return fetchService({
+        url: `/projects/update/${id}`,
+        method: "PUT",
+        params: { description, user_id: state.id, type },
+        token: "",
+      });
+    },
+
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("projects");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
+
+  const { mutate: pauseProject } = useMutation(
+    ({ id }) => {
+      return fetchService({
+        url: `/projects/pause/${id}`,
+        method: "PATCH",
+        token: "",
+      });
+    },
+
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("projects");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
+
+  const { mutate: reactivateProject } = useMutation(
+    ({ id }) => {
+      return fetchService({
+        url: `/projects/reactivate/${id}`,
+        method: "PATCH",
+        token: "",
+      });
+    },
+
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("projects");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
+
   const { mutate } = useMutation(
     (values) => {
       return fetchService({
         url: "/projects/add",
-        params: { description: values.description, user_id: state.id || 1 },
+        params: {
+          description: values.description,
+          user_id: state.id || 1,
+          type: values.type,
+        },
         method: "POST",
         token: "",
       });
@@ -82,7 +172,7 @@ export default function Dashboard() {
   }
 
   const createProject = () => {
-    mutate({ description });
+    mutate({ description, type });
   };
 
   const handleOnChangeDescription = (e) => {
@@ -91,6 +181,20 @@ export default function Dashboard() {
 
   const closeModal = () => {
     setIsOpenModal(false);
+  };
+
+  const editProject = (id, currentDesc) => {
+    updateProjectMutation({
+      id,
+      description: description || currentDesc,
+      type,
+    });
+    setEditable(null);
+    setDescription("");
+  };
+
+  const onChangeType = ({ target }) => {
+    setType(target?.value);
   };
   return (
     <>
@@ -106,6 +210,20 @@ export default function Dashboard() {
                 e.key === "Enter" && createProject();
               }}
             />
+            <FormControl>
+              <InputLabel id="demo-simple-select-label">Tipo</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={type}
+                label="Tipo"
+                onChange={onChangeType}
+              >
+                <MenuItem value={"Ninguno"}>Ninguno</MenuItem>
+                <MenuItem value={"ISO-IEC 25010"}>ISO-IEC 25010</MenuItem>
+                <MenuItem value={"ISO-IEC 33000"}>ISO-IEC 33000</MenuItem>
+              </Select>
+            </FormControl>
           </div>
           <div className={styles.controls}>
             <Button variant="outlined" onClick={closeModal}>
@@ -117,7 +235,7 @@ export default function Dashboard() {
           </div>
         </Dialog>
         <div className={styles.header}>
-          <SearchBar />
+          <SearchBar onSearch={onSearch} />
           <Button
             variant="outlined"
             className={styles["header__button"]}
@@ -146,34 +264,75 @@ export default function Dashboard() {
                     <TableCell component="th" scope="row">
                       {row.id}
                     </TableCell>
-                    <TableCell align="center">{row.description}</TableCell>
+                    <TableCell align="center">
+                      {editable === row.id ? (
+                        <TextField
+                          label=""
+                          variant="standard"
+                          onChange={handleOnChangeDescription}
+                          defaultValue={row.description}
+                          onKeyDown={(e) => {
+                            e.key === "Enter" && editProject(row.id);
+                          }}
+                        />
+                      ) : (
+                        row.description
+                      )}
+                    </TableCell>
                     <TableCell align="center">
                       {editable === row.id ? (
                         <FormControl className={styles.select}>
                           <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
-                            value={10}
+                            value={type}
                             style={{ height: "40px" }}
                             variant="standard"
-                            // onChange={handleChange}
+                            defaultValue={row.type}
+                            onChange={onChangeType}
                           >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
+                            <MenuItem value={"Ninguno"}>Ninguno</MenuItem>
+                            <MenuItem value={"ISO-IEC 25010"}>
+                              ISO-IEC 25010
+                            </MenuItem>
+                            <MenuItem value={"ISO-IEC 33000"}>
+                              ISO-IEC 33000
+                            </MenuItem>
                           </Select>
                         </FormControl>
                       ) : (
-                        "Tipo"
+                        row.type
                       )}
                     </TableCell>
                     <TableCell align="center">
                       <div className={styles.icons_row}>
-                        <PanToolIcon />
-                        <div onClick={() => setEditable(row.id)}>
+                        {row.status === "active" ? (
+                          <div
+                            onClick={() => pauseProject({ id: row.id })}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <PanToolIcon />
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => reactivateProject({ id: row.id })}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <PlayCircleFilledIcon />
+                          </div>
+                        )}
+                        <div
+                          onClick={() => setEditable(row.id)}
+                          style={{ cursor: "pointer" }}
+                        >
                           <EditIcon />
                         </div>
-                        <DeleteIcon />
+                        <div
+                          onClick={() => deleteProjectMutation(row.id)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <DeleteIcon />
+                        </div>
                         <div
                           style={{
                             cursor: "pointer",
@@ -182,7 +341,11 @@ export default function Dashboard() {
                           }}
                           onClick={() => setEditable(false)}
                         >
-                          <SaveIcon style={{ color: "green" }} />
+                          <div
+                            onClick={() => editProject(row.id, row.description)}
+                          >
+                            <SaveIcon style={{ color: "green" }} />
+                          </div>
                         </div>
                       </div>
                     </TableCell>

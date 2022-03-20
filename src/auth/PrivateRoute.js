@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { useAuth } from "../context/authContext";
 function PrivateRoute({ Component, redirectTo }) {
   const { state } = useAuth();
+  console.log(state);
   return state.token ? <Component /> : <Navigate to={redirectTo} replace />;
 }
 

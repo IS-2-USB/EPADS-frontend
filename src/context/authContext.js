@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 
 const AppContext = createContext();
 
@@ -11,7 +11,7 @@ const initialState = {
 };
 
 const manageAuth = (state, result) => {
-  localStorage.setItem("token", result.token);
+  localStorage.setItem("user", JSON.stringify(result));
   return {
     ...state,
     first_name: result.first_name,
@@ -54,13 +54,10 @@ const reducer = (state, action) => {
 
 // eslint-disable-next-line react/prop-types
 const AuthProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, {
-    token: localStorage.getItem("token"),
-    first_name: "",
-    last_name: "",
-    type: "",
-    isLoading: true,
-  });
+  const [state, dispatch] = useReducer(
+    reducer,
+    JSON.parse(localStorage.getItem("user") || "{}")
+  );
   const value = { state, dispatch };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
