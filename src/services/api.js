@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:4200";
+const BASE_URL = "http://localhost:5000";
 
 export async function fetchService({
   url,
@@ -26,7 +26,7 @@ export async function fetchService({
     const response = await fetch(objectRequest.url, objectRequest).then(
       (resp) => resp.json()
     );
-
+    console.log(response)
     return response;
   } catch (e) {
     console.log(e);
