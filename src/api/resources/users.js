@@ -11,11 +11,11 @@ const usersResource = "user";
 const Users = {
     getAll: () => getAll(usersResource),
     get: (id) => get(usersResource, id),
-    register: () => register(usersResource),
+    register: (data) => register(usersResource, data),
     login: () => login(usersResource),
-    remove: (username) => deleteUser(usersResource, { username }),
-    edit: ({ username, new_role }) =>
-        editUser(usersResource, { username, new_role }),
+    remove: (username, token) => deleteUser(usersResource, { username }, token),
+    edit: ({ username, new_role, token }) =>
+        editUser(usersResource, { username, new_role }, token ),
 };
 
 export { Users };

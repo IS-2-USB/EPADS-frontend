@@ -25,3 +25,20 @@
   justify-content: center;
   gap: 1rem;
 }
+
+.form {
+  padding: 0 1.5rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 30rem;
+}
+
+.controls {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  width: 100;
+  justify-content: center;
+  gap: 1rem;
+}
