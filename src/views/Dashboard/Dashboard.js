@@ -47,7 +47,12 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const [editable, setEditable] = useState(null);
   const [description, setDescription] = useState();
+  const [general, setGeneral] = useState();
+  const [specifics, setSpecifics] = useState();
+  const [motivations, setMotivations] = useState();
+  const [version, setVersion] = useState(0);
   const [type, setType] = useState("Ninguno");
+  const [representation, setRepresentation] = useState("Etapas");
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [projects, setProjects] = useState([]);
@@ -147,12 +152,17 @@ export default function Dashboard() {
 
   const { mutate } = useMutation(
     (values) => {
+      console.log(values)
       return fetchService({
         url: "/projects/add",
         params: {
           description: values.description,
           user_id: state.id || 1,
           type: values.type,
+          version: values.version,
+          general: values.general,
+          specifics: values.specifics,
+          motivations: values.motivations,
         },
         method: "POST",
         token: "",
@@ -172,7 +182,9 @@ export default function Dashboard() {
   }
 
   const createProject = () => {
-    mutate({ description, type });
+    mutate({ description, type, version, general, specifics, motivations });
+    setVersion(0);
+    setType("Ninguno");
   };
 
   const handleOnChangeDescription = (e) => {
@@ -196,6 +208,27 @@ export default function Dashboard() {
   const onChangeType = ({ target }) => {
     setType(target?.value);
   };
+
+  const onChangeRepresentation = ({ target }) => {
+    setRepresentation(target?.value);
+  };
+
+  const onChangeVersion = ({ target }) => {
+    setVersion(target?.value);
+  };
+
+  const onChangeGeneral = ({target}) => {
+    setGeneral(target?.value);
+  }; 
+
+  const onChangeSpecifics = ({ target }) => {
+    setSpecifics(target?.value);
+  }; 
+
+  const onChangeMotivations = ( { target } ) => {
+    setMotivations(target?.value);
+  };
+
   return (
     <>
       <div className={styles.container}>
@@ -224,6 +257,43 @@ export default function Dashboard() {
                 <MenuItem value={"ISO-IEC 33000"}>ISO-IEC 33000</MenuItem>
               </Select>
             </FormControl>
+            <TextField
+              label="Version"
+              onChange={onChangeVersion}
+              onKeyDown={(e) => {
+                e.key === "Enter" && createProject();
+              }}
+              type = 'number'
+              defaultValue={version}
+            />
+            <FormControl>
+              <InputLabel id="demo-simple-select-label">Representacion</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={representation}
+                label="Representacion"
+                onChange={onChangeRepresentation}
+              >
+                <MenuItem value={"Etapas"}>Etapas</MenuItem>
+                <MenuItem value={"Continua"}>Continua</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="Objetivo General"
+              onChange={onChangeGeneral}
+              multiline
+            />
+             <TextField
+              label="Objetivos Especificos"
+              onChange={onChangeSpecifics}
+              multiline
+            />
+             <TextField
+              label="Motivacion"
+              onChange={onChangeMotivations}
+              multiline
+            />
           </div>
           <div className={styles.controls}>
             <Button variant="outlined" onClick={closeModal}>
