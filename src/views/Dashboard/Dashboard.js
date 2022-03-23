@@ -152,7 +152,6 @@ export default function Dashboard() {
 
   const { mutate } = useMutation(
     (values) => {
-      console.log(values)
       return fetchService({
         url: "/projects/add",
         params: {
@@ -392,7 +391,11 @@ export default function Dashboard() {
                           </div>
                         )}
                         <div
-                          onClick={() => setEditable(row.id)}
+                          onClick={() => {
+                            setEditable(row.id)
+                            setDescription(row.description)
+                            setType(row.type)
+                          }}
                           style={{ cursor: "pointer" }}
                         >
                           <EditIcon />
