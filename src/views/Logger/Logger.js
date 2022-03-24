@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
+  Button,
+  Dialog,
+  DialogTitle,
   Divider,
   Drawer,
   List,
@@ -14,21 +17,17 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Toolbar,
 } from "@mui/material";
-import PanToolIcon from "@mui/icons-material/PanTool";
-import EditIcon from "@mui/icons-material/Edit";
-import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from '@mui/icons-material/Search';
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
-import SaveIcon from "@mui/icons-material/Save";
 import styles from "./logger.module.scss";
 import SearchBar from "../../searchBar";
 import { useNavigate } from "react-router-dom";
-import { setLogger, useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { fetchService } from "../../services/api";
 import { useAuth } from "../../context/authContext";
 const drawerWidth = 200;
@@ -36,6 +35,8 @@ const drawerWidth = 200;
 export default function Logger() {
   const { state } = useAuth();
   const [currentPage, setCurrenPage] = useState(1);
+  const [currentLog, setCurrentLog] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const queryClient = useQueryClient();
   const [searchValue, setSearchValue] = useState("");
@@ -105,6 +106,28 @@ export default function Logger() {
     <>
       <div className={styles.container}>
         <h1>Logger de eventos</h1>
+        <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+            <DialogTitle>Detalle del Log</DialogTitle>
+            <div className={styles.form}>
+              <div>
+                <h5 className={styles.inline_display}>Evento: </h5>{currentLog.event}
+              </div>
+              <div>
+                <h5 className={styles.inline_display}>Módulo: </h5>{currentLog.loged_module}
+              </div>
+              <div>
+                <h5 className={styles.inline_display}>Usuario: </h5>{currentLog.user}
+              </div>
+              <div>
+                <h5 className={styles.inline_display}>Fecha: </h5> {currentLog.date}, {currentLog.time} 
+              </div>
+            </div>
+            <div className={styles.controls}>
+                <Button variant="outlined" onClick={() => setOpenModal(false)}>
+                    Cerrar
+                </Button>
+            </div>
+        </Dialog>
         <div className={styles.header}>
           <SearchBar onSearch={onSearch} />
         </div>
@@ -148,6 +171,15 @@ export default function Logger() {
                     </TableCell>
                     <TableCell align="center">
                       <div className={styles.icons_row}>
+                        <div
+                            onClick={() => {
+                              setCurrentLog(row);
+                              setOpenModal(true);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <SearchIcon />
+                        </div>
                         <div
                           onClick={() => deleteLoggerEventMutation(row.id)}
                           style={{ cursor: "pointer" }}
