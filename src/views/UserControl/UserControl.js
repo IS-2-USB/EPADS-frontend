@@ -99,12 +99,18 @@ export default function UserControl() {
         };
     };
 
-    function dash() {
-        console.log("entre");
-
-        router("/dashboard");
+    function user() {
+        router("/users");
     }
-
+    
+    function dash(){
+        router("/dashboard")
+      }
+    
+    function logger(){
+        router("/logger")
+    }
+    
     const createUser = async () => {
         await Users.register(newUserData);
         setOpenModal(false);
@@ -482,13 +488,13 @@ export default function UserControl() {
                 <Divider />
                 <List>
                     {[
-                        { name: "Proyectos", icon: <FolderIcon /> },
-                        { name: "Usuarios", icon: <PeopleIcon /> },
-                        { name: "Eventos", icon: <EventNoteIcon /> },
-                    ].map(({ name, icon }, index) => (
-                        <ListItem button onClick={() => dash()} key={name}>
-                            <ListItemIcon>{icon}</ListItemIcon>
-                            <ListItemText primary={name} />
+                        { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
+                        { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
+                        { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+                    ].map(({ name, redirect, icon }, index) => (
+                        <ListItem button onClick={redirect} key={name}>
+                        <ListItemIcon>{icon}</ListItemIcon>
+                        <ListItemText primary={name} />
                         </ListItem>
                     ))}
                 </List>

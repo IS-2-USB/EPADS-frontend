@@ -171,6 +171,14 @@ export default function Dashboard() {
     router("/users");
   }
 
+  function dash(){
+    router("/dashboard")
+  }
+
+  function logger(){
+    router("/logger")
+  }
+
   const createProject = () => {
     mutate({ description, type });
   };
@@ -378,11 +386,11 @@ export default function Dashboard() {
         <Divider />
         <List>
           {[
-            { name: "Proyectos", icon: <FolderIcon /> },
-            { name: "Usuarios", icon: <PeopleIcon /> },
-            { name: "Eventos", icon: <EventNoteIcon /> },
-          ].map(({ name, icon }, index) => (
-            <ListItem button onClick={() => user()} key={name}>
+            { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
+            { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
+            { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+          ].map(({ name, redirect, icon }, index) => (
+            <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>
               <ListItemText primary={name} />
             </ListItem>
