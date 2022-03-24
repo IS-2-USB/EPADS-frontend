@@ -206,6 +206,12 @@ export default function Dashboard() {
       id,
       description: description || currentDesc,
       type,
+      name,
+      general,
+      specifics,
+      motivations,
+      version,
+      representation,
     });
     setEditable(null);
     setDescription("");
@@ -347,6 +353,12 @@ export default function Dashboard() {
             <Button variant="contained" onClick={() => { 
               editProject(currentId);
               closeModal2();
+              setName("");
+              setGeneral("");
+              setSpecifics("");
+              setMotivations("");
+              setVersion(0);
+              setRepresentation("")
             }}>
               Generar
             </Button>
