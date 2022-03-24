@@ -27,6 +27,7 @@ import {
 import PanToolIcon from "@mui/icons-material/PanTool";
 import EditIcon from "@mui/icons-material/Edit";
 import ArticleIcon from '@mui/icons-material/Article';
+import DownloadIcon from '@mui/icons-material/Download';
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -502,6 +503,11 @@ export default function Dashboard() {
                           style={{ cursor: "pointer" }}
                         >
                           <DeleteIcon />
+                        </div>
+                        <div
+                          style={{ cursor: "pointer" }}
+                        >
+                          <DownloadIcon />
                         </div>
                         <div
                           style={{
