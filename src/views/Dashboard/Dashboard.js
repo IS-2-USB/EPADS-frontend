@@ -270,43 +270,6 @@ export default function Dashboard() {
                 <MenuItem value={"ISO-IEC 33000"}>ISO-IEC 33000</MenuItem>
               </Select>
             </FormControl>
-            <TextField
-              label="Version"
-              onChange={onChangeVersion}
-              onKeyDown={(e) => {
-                e.key === "Enter" && createProject();
-              }}
-              type = 'number'
-              defaultValue={version}
-            />
-            <FormControl>
-              <InputLabel id="demo-simple-select-label">Representacion</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={representation}
-                label="Representacion"
-                onChange={onChangeRepresentation}
-              >
-                <MenuItem value={"Etapas"}>Etapas</MenuItem>
-                <MenuItem value={"Continua"}>Continua</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              label="Objetivo General"
-              onChange={onChangeGeneral}
-              multiline
-            />
-             <TextField
-              label="Objetivos Especificos"
-              onChange={onChangeSpecifics}
-              multiline
-            />
-             <TextField
-              label="Motivacion"
-              onChange={onChangeMotivations}
-              multiline
-            />
           </div>
           <div className={styles.controls}>
             <Button variant="outlined" onClick={closeModal}>
