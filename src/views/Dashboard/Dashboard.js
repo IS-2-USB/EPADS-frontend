@@ -26,6 +26,8 @@ import {
 } from "@mui/material";
 import PanToolIcon from "@mui/icons-material/PanTool";
 import EditIcon from "@mui/icons-material/Edit";
+import ArticleIcon from '@mui/icons-material/Article';
+import DownloadIcon from '@mui/icons-material/Download';
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -46,9 +48,17 @@ export default function Dashboard() {
   const [pageCount, setPageCount] = useState(0);
   const queryClient = useQueryClient();
   const [editable, setEditable] = useState(null);
-  const [description, setDescription] = useState();
+  const [description, setDescription] = useState("");
+  const [name, setName] = useState("");
+  const [general, setGeneral] = useState("");
+  const [specifics, setSpecifics] = useState("");
+  const [motivations, setMotivations] = useState("");
+  const [version, setVersion] = useState(0);
   const [type, setType] = useState("Ninguno");
+  const [representation, setRepresentation] = useState("");
+  const [currentId, setCurrentId] = useState(0);
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isOpenModal2, setIsOpenModal2] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [projects, setProjects] = useState([]);
   const router = useNavigate();
@@ -98,7 +108,7 @@ export default function Dashboard() {
       return fetchService({
         url: `/projects/update/${id}`,
         method: "PUT",
-        params: { description, user_id: state.id, type },
+        params: { description, user_id: state.id, type, name, representation, general, specifics, motivations },
         token: "",
       });
     },
@@ -171,8 +181,20 @@ export default function Dashboard() {
     router("/users");
   }
 
+  function dash(){
+    router("/dashboard")
+  }
+
+  function logger(){
+    router("/logger")
+  }
+
   const createProject = () => {
-    mutate({ description, type });
+    mutate({ description, type, version, general, specifics, motivations });
+    setVersion(0);
+    setType("Ninguno");
+    setRepresentation("");
+    setDescription("");
   };
 
   const handleOnChangeDescription = (e) => {
@@ -183,19 +205,57 @@ export default function Dashboard() {
     setIsOpenModal(false);
   };
 
+  const closeModal2 = () => {
+    setIsOpenModal2(false);
+  };
+
   const editProject = (id, currentDesc) => {
     updateProjectMutation({
       id,
       description: description || currentDesc,
       type,
+      name,
+      general,
+      specifics,
+      motivations,
+      version,
+      representation,
     });
     setEditable(null);
     setDescription("");
+    setVersion(0);
+    setType("Ninguno");
+    setRepresentation("");
   };
 
   const onChangeType = ({ target }) => {
     setType(target?.value);
   };
+
+  const onChangeRepresentation = ({ target }) => {
+    setRepresentation(target?.value);
+  };
+
+  const onChangeVersion = ({ target }) => {
+    setVersion(target?.value);
+  };
+
+  const onChangeGeneral = ({target}) => {
+    setGeneral(target?.value);
+  }; 
+
+  const onChangeSpecifics = ({ target }) => {
+    setSpecifics(target?.value);
+  }; 
+
+  const onChangeMotivations = ( { target } ) => {
+    setMotivations(target?.value);
+  };
+
+  const onChangeName = ( { target } ) => {
+    setName(target?.value);
+  };
+
   return (
     <>
       <div className={styles.container}>
@@ -231,6 +291,84 @@ export default function Dashboard() {
             </Button>
             <Button variant="contained" onClick={createProject}>
               Crear
+            </Button>
+          </div>
+        </Dialog>
+        <Dialog open={isOpenModal2} onClose={closeModal2}>
+          <DialogTitle>Generar proyecto</DialogTitle>
+          <div className={styles.form}>
+            <TextField
+              label="Nombre"
+              onChange={onChangeName}
+              value = {name}
+            />
+            <FormControl>
+              <InputLabel id="demo-simple-select-label">Tipo</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={type}
+                label="Tipo"
+                onChange={onChangeType}
+              >
+                <MenuItem value={"Ninguno"}>Ninguno</MenuItem>
+                <MenuItem value={"ISO-IEC 25010"}>ISO-IEC 25010</MenuItem>
+                <MenuItem value={"ISO-IEC 33000"}>ISO-IEC 33000</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="Version"
+              onChange={onChangeVersion}
+              onKeyDown={(e) => {
+                e.key === "Enter" && createProject();
+              }}
+              type = 'number'
+              defaultValue={version}
+            />
+            <FormControl>
+              <InputLabel id="demo-simple-select-label">Representacion</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={representation}
+                label="Representacion"
+                onChange={onChangeRepresentation}
+              >
+                <MenuItem value={"Etapas"}>Etapas</MenuItem>
+                <MenuItem value={"Continua"}>Continua</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="Objetivo General"
+              onChange={onChangeGeneral}
+              multiline
+            />
+             <TextField
+              label="Objetivos Especificos"
+              onChange={onChangeSpecifics}
+              multiline
+            />
+             <TextField
+              label="Motivacion"
+              onChange={onChangeMotivations}
+              multiline
+            />
+          </div>
+          <div className={styles.controls}>
+            <Button variant="outlined" onClick={closeModal2}>
+              Cancelar
+            </Button>
+            <Button variant="contained" onClick={() => { 
+              editProject(currentId);
+              closeModal2();
+              setName("");
+              setGeneral("");
+              setSpecifics("");
+              setMotivations("");
+              setVersion(0);
+              setRepresentation("")
+            }}>
+              Generar
             </Button>
           </div>
         </Dialog>
@@ -306,6 +444,18 @@ export default function Dashboard() {
                     </TableCell>
                     <TableCell align="center">
                       <div className={styles.icons_row}>
+                        <div
+                          onClick={() => {
+                            setIsOpenModal2(true);
+                            setDescription(row.description);
+                            setVersion(row.version)
+                            setType(row.type)
+                            setCurrentId(row.id)
+                          }}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <ArticleIcon />
+                        </div>
                         {row.status === "active" ? (
                           <div
                             onClick={() => pauseProject({ id: row.id })}
@@ -322,7 +472,11 @@ export default function Dashboard() {
                           </div>
                         )}
                         <div
-                          onClick={() => setEditable(row.id)}
+                          onClick={() => {
+                            setEditable(row.id)
+                            setDescription(row.description)
+                            setType(row.type)
+                          }}
                           style={{ cursor: "pointer" }}
                         >
                           <EditIcon />
@@ -332,6 +486,11 @@ export default function Dashboard() {
                           style={{ cursor: "pointer" }}
                         >
                           <DeleteIcon />
+                        </div>
+                        <div
+                          style={{ cursor: "pointer" }}
+                        >
+                          <DownloadIcon />
                         </div>
                         <div
                           style={{
@@ -378,11 +537,11 @@ export default function Dashboard() {
         <Divider />
         <List>
           {[
-            { name: "Proyectos", icon: <FolderIcon /> },
-            { name: "Usuarios", icon: <PeopleIcon /> },
-            { name: "Eventos", icon: <EventNoteIcon /> },
-          ].map(({ name, icon }, index) => (
-            <ListItem button onClick={() => user()} key={name}>
+            { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
+            { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
+            { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+          ].map(({ name, redirect, icon }, index) => (
+            <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>
               <ListItemText primary={name} />
             </ListItem>

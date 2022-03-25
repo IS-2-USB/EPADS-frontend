@@ -26,10 +26,11 @@ const get = (resource, id) => {
     });
 };
 
-const register = (resource) => {
+const register = (resource, data) => {
     return axiosMethod({
         method: "post",
         url: `${URL}/${resource}/register`,
+        data,
     });
 };
 
@@ -54,19 +55,25 @@ const edit = (resource) => {
     });
 };
 
-const editUser = (resource, data) => {
+const editUser = (resource, data, token) => {
     return axiosMethod({
         method: "post",
         url: `${URL}/${resource}/edit`,
         data,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
     });
 };
 
-const deleteUser = (resource, data) => {
+const deleteUser = (resource, data, token) => {
     return axiosMethod({
         method: "post",
         url: `${URL}/${resource}/delete`,
         data,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
     });
 };
 

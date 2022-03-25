@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
+    Button,
+    Dialog,
+    DialogTitle,
     Divider,
     Drawer,
     FormControl,
+    InputLabel,
     List,
     ListItem,
     ListItemIcon,
@@ -16,6 +20,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    TextField,
     Toolbar,
 } from "@mui/material";
 import PanToolIcon from "@mui/icons-material/PanTool";
@@ -30,10 +35,22 @@ import { useNavigate } from "react-router-dom";
 import { Users } from "../../api/resources/users";
 import { Projects } from "../../api/resources/projects";
 import SearchBar from "../../searchBar";
+import { useAuth } from "../../context/authContext";
 
 const drawerWidth = 200;
-
+const roles = ["Product Owner", "Scrum Master", "Scrum Team"];
 export default function UserControl() {
+    const [openModal, setOpenModal] = useState(false);
+    const [newUserData, setNewUserData] = useState({
+        username: "",
+        first_name: "",
+        last_name: "",
+        role: roles[2],
+        password: "",
+    });
+
+    const [searchValue, setSearchValue] = useState("");
+
     const [editable, setEditable] = useState(null);
     const [projects, setProjects] = useState([]);
     const [editableRole, setEditableRole] = useState("");
@@ -44,7 +61,19 @@ export default function UserControl() {
     const [rows, setRows] = useState([]);
     const [change, setChange] = useState(false);
 
-    const filteredRows = [];
+    const {
+        state: { token },
+    } = useAuth();
+
+    const filteredRows =
+        searchValue !== ""
+            ? rows.filter((row) =>
+                  row.login.toLowerCase().includes(searchValue.toLowerCase())
+              )
+            : rows;
+
+    console.log("filtered rows ", filteredRows);
+    console.log("searchvalue ", searchValue);
 
     const router = useNavigate();
 
@@ -70,23 +99,57 @@ export default function UserControl() {
         };
     };
 
-    const roles = ["Product Owner", "Scrum Master", "Scrum Team"];
-
-    function dash() {
-        console.log("entre");
-
-        router("/dashboard");
+    function user() {
+        router("/users");
     }
+    
+    function dash(){
+        router("/dashboard")
+      }
+    
+    function logger(){
+        router("/logger")
+    }
+    
+    const createUser = async () => {
+        await Users.register(newUserData);
+        setOpenModal(false);
+        setChange(!change);
+    };
 
-    const editUser = async ({ username, new_role }) => {
-        await Users.edit({ username, new_role });
+    const editUser = async ({ username, new_role, token }) => {
+        await Users.edit({ username, new_role, token });
         setChange(!change);
     };
 
     const deleteUser = async (username) => {
-        await Users.remove(username);
+        await Users.remove(username, token);
         setChange(!change);
         setEditable(false);
+    };
+
+    const onChangeNewUserFirstName = ({ target: { value } }) => {
+        setNewUserData({ ...newUserData, first_name: value });
+    };
+
+    const onChangeNewUserLastName = ({ target: { value } }) => {
+        setNewUserData({ ...newUserData, last_name: value });
+    };
+
+    const onChangeNewUserUsername = ({ target: { value } }) => {
+        setNewUserData({ ...newUserData, username: value });
+    };
+
+    const onChangeNewUserRole = ({ target: { value } }) => {
+        setNewUserData({ ...newUserData, role: value });
+    };
+
+    const onChangeNewUserPassword = ({ target: { value } }) => {
+        setNewUserData({ ...newUserData, password: value });
+    };
+
+    const onSearch = ({ target: { value } }) => {
+        setSearchValue(value);
     };
 
     const onChangeRole = (event) => setEditableRole(event.target.value);
@@ -107,10 +170,13 @@ export default function UserControl() {
         setEditableProjects({ project1, project2 });
     };
 
-    const onSaveClick = ({ username, new_role }) => {
-        editUser({ username, new_role });
+    const onSaveClick = ({ username, new_role, token }) => {
+        console.log("token ", token);
+        editUser({ username, new_role, token });
         setEditable(false);
     };
+
+    const closeModal = () => setOpenModal(false);
 
     useEffect(async () => {
         const projectsReponse = await Projects.getAll();
@@ -144,8 +210,62 @@ export default function UserControl() {
         <div className={styles.container}>
             <div className={styles.container}>
                 <h1>Usuarios</h1>
+                <Dialog open={openModal} onClose={closeModal}>
+                    <DialogTitle>Crear nuevo usuario</DialogTitle>
+                    <div className={styles.form}>
+                        <TextField
+                            label="Usuario"
+                            onChange={onChangeNewUserUsername}
+                        />
+                        <TextField
+                            label="Nombre"
+                            onChange={onChangeNewUserFirstName}
+                        />
+                        <TextField
+                            label="Apellido"
+                            onChange={onChangeNewUserLastName}
+                        />
+                        <TextField
+                            label="Contraseña"
+                            onChange={onChangeNewUserPassword}
+                        />
+                        <FormControl>
+                            <InputLabel id="demo-simple-select-label">
+                                Rol
+                            </InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={newUserData.role}
+                                label="Rol"
+                                onChange={onChangeNewUserRole}
+                            >
+                                {roles.map((role) => (
+                                    <MenuItem value={role} key={role}>
+                                        {role}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </div>
+                    <div className={styles.controls}>
+                        <Button variant="outlined" onClick={closeModal}>
+                            Cancelar
+                        </Button>
+                        <Button variant="contained" onClick={createUser}>
+                            Crear
+                        </Button>
+                    </div>
+                </Dialog>
                 <div className={styles.header}>
-                    <SearchBar />
+                    <SearchBar onSearch={onSearch} />
+                    <Button
+                        variant="outlined"
+                        className={styles["header__button"]}
+                        onClick={() => setOpenModal(true)}
+                    >
+                        Crear Usuario
+                    </Button>
                 </div>
                 <div>
                     <TableContainer component={Paper}>
@@ -173,7 +293,7 @@ export default function UserControl() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.map((row) => (
+                                {filteredRows.map((row) => (
                                     <TableRow
                                         key={row.id}
                                         sx={{
@@ -331,7 +451,9 @@ export default function UserControl() {
                                                     onClick={() =>
                                                         onSaveClick({
                                                             username: row.login,
-                                                            new_role: editableRole,
+                                                            new_role:
+                                                                editableRole,
+                                                            token: token,
                                                         })
                                                     }
                                                 >
@@ -366,13 +488,13 @@ export default function UserControl() {
                 <Divider />
                 <List>
                     {[
-                        { name: "Proyectos", icon: <FolderIcon /> },
-                        { name: "Usuarios", icon: <PeopleIcon /> },
-                        { name: "Eventos", icon: <EventNoteIcon /> },
-                    ].map(({ name, icon }, index) => (
-                        <ListItem button onClick={() => dash()} key={name}>
-                            <ListItemIcon>{icon}</ListItemIcon>
-                            <ListItemText primary={name} />
+                        { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
+                        { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
+                        { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+                    ].map(({ name, redirect, icon }, index) => (
+                        <ListItem button onClick={redirect} key={name}>
+                        <ListItemIcon>{icon}</ListItemIcon>
+                        <ListItemText primary={name} />
                         </ListItem>
                     ))}
                 </List>

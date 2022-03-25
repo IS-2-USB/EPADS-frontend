@@ -2,6 +2,7 @@ import "./App.scss";
 import Dashboard from "./views/Dashboard/Dashboard";
 import UserControl from "./views/UserControl/UserControl.js";
 import Login from "./views/login/Login.js";
+import Logger from "./views/Logger/Logger.js"
 import SignUp from "./views/signUp/signUp.js";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/authContext";
@@ -32,6 +33,13 @@ function App() {
                 path="/users"
                 element={
                   <PrivateRoute redirectTo="/" Component={UserControl} />
+                }
+              />
+              <Route
+                exact
+                path="/logger"
+                element={
+                  <PrivateRoute redirectTo="/" Component={Logger} />
                 }
               />
             </Routes>
