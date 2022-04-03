@@ -108,6 +108,7 @@ export default function Logger() {
         <h1>Logger de eventos</h1>
         <Dialog open={openModal} onClose={() => setOpenModal(false)}>
             <DialogTitle>Detalle del Log</DialogTitle>
+            {currentLog && 
             <div className={styles.form}>
               <div>
                 <h5 className={styles.inline_display}>Evento: </h5>{currentLog.event}
@@ -122,6 +123,7 @@ export default function Logger() {
                 <h5 className={styles.inline_display}>Fecha: </h5> {currentLog.date}, {currentLog.time} 
               </div>
             </div>
+            }
             <div className={styles.controls}>
                 <Button variant="outlined" onClick={() => setOpenModal(false)}>
                     Cerrar
