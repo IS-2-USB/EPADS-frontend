@@ -34,12 +34,14 @@ import styles from "./userControl.module.scss";
 import { useNavigate } from "react-router-dom";
 import { Users } from "../../api/resources/users";
 import { Projects } from "../../api/resources/projects";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SearchBar from "../../searchBar";
 import { useAuth } from "../../context/authContext";
 
 const drawerWidth = 200;
 const roles = ["Product Owner", "Scrum Master", "Scrum Team"];
 export default function UserControl() {
+    const { dispatch } = useAuth();
     const [openModal, setOpenModal] = useState(false);
     const [newUserData, setNewUserData] = useState({
         username: "",
@@ -110,6 +112,17 @@ export default function UserControl() {
     function logger(){
         router("/logger")
     }
+
+    function process(){
+        router("/process")
+    }
+
+    function exit(){
+        dispatch({
+          type: "logout"
+        });
+        router("/")
+      }
     
     const createUser = async () => {
         await Users.register(newUserData);
@@ -484,13 +497,19 @@ export default function UserControl() {
                 variant="permanent"
                 anchor="left"
             >
-                <Toolbar />
+                <Toolbar>
+                    <Button variant="contained" style={{background: "red"}} onClick={() => { exit()}}>
+                        <h6 style={{fontSize: "smaller", marginBottom: "0", marginLeft: "2px"}}>Cerrar sesión</h6>
+                        <ExitToAppIcon />
+                    </Button>
+                </Toolbar>
                 <Divider />
                 <List>
                     {[
                         { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
                         { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
                         { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+                        { name: "Procesos", redirect: () => {process()}, icon: <FolderIcon /> },
                     ].map(({ name, redirect, icon }, index) => (
                         <ListItem button onClick={redirect} key={name}>
                         <ListItemIcon>{icon}</ListItemIcon>

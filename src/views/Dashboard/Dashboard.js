@@ -35,6 +35,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
 import styles from "./dashboard.module.scss";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SearchBar from "../../searchBar";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -62,6 +63,7 @@ export default function Dashboard() {
   const [searchValue, setSearchValue] = useState("");
   const [projects, setProjects] = useState([]);
   const router = useNavigate();
+  const { dispatch } = useAuth();
   const { data } = useQuery("projects", () =>
     fetchService({ url: `/projects/getall/${state.id || 1}` })
   );
@@ -187,6 +189,17 @@ export default function Dashboard() {
 
   function logger(){
     router("/logger")
+  }
+
+  function process(){
+    router("/process")
+  }
+
+  function exit(){
+    dispatch({
+      type: "logout"
+    });
+    router("/")
   }
 
   const createProject = () => {
@@ -533,13 +546,19 @@ export default function Dashboard() {
         variant="permanent"
         anchor="left"
       >
-        <Toolbar />
+        <Toolbar>
+          <Button variant="contained" style={{background: "red"}} onClick={() => { exit()}}>
+            <h6 style={{fontSize: "smaller", marginBottom: "0", marginLeft: "2px"}}>Cerrar sesión</h6>
+            <ExitToAppIcon />
+          </Button>
+        </Toolbar>
         <Divider />
         <List>
           {[
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+            { name: "Procesos", redirect: () => {process()}, icon: <FolderIcon /> },
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>

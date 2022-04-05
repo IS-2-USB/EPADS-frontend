@@ -11,6 +11,7 @@ import { createTheme } from "@mui/material";
 import PrivateRoute from "./auth/PrivateRoute";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import Process from "./views/process/process";
 const theme = createTheme();
 
 function App() {
@@ -40,6 +41,13 @@ function App() {
                 path="/logger"
                 element={
                   <PrivateRoute redirectTo="/" Component={Logger} />
+                }
+              />
+              <Route
+                exact
+                path="/process"
+                element={
+                  <PrivateRoute redirectTo="/" Component={Process} />
                 }
               />
             </Routes>

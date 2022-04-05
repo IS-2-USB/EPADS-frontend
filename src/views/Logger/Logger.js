@@ -30,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { fetchService } from "../../services/api";
 import { useAuth } from "../../context/authContext";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 const drawerWidth = 200;
 
 export default function Logger() {
@@ -42,6 +43,7 @@ export default function Logger() {
   const [searchValue, setSearchValue] = useState("");
   const [loggerEvents, setLoggerEvents] = useState([]);
   const router = useNavigate();
+  const { dispatch } = useAuth();
   const { data } = useQuery("logger", () =>
     fetchService({ url: '/logger/getall'})
   );
@@ -100,6 +102,17 @@ export default function Logger() {
 
   function logger(){
     router("/logger")
+  }
+
+  function process(){
+    router("/process")
+  }
+
+  function exit(){
+    dispatch({
+      type: "logout"
+    });
+    router("/")
   }
 
   return (
@@ -215,13 +228,19 @@ export default function Logger() {
         variant="permanent"
         anchor="left"
       >
-        <Toolbar />
+        <Toolbar>
+          <Button variant="contained" style={{background: "red"}} onClick={() => { exit()}}>
+            <h6 style={{fontSize: "smaller", marginBottom: "0", marginLeft: "2px"}}>Cerrar sesión</h6>
+            <ExitToAppIcon />
+          </Button>
+        </Toolbar>
         <Divider />
         <List>
           {[
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+            { name: "Procesos", redirect: () => {process()}, icon: <FolderIcon /> },
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>
