@@ -46,14 +46,16 @@ export default function Process() {
   const [editable, setEditable] = useState(null);
   const [description, setDescription] = useState("");
   const [type, setType] = useState("Ninguno");
+  const [oldType, setOldType] = useState("Ninguno");
   const [currentId, setCurrentId] = useState(0);
   const [isOpenModal2, setIsOpenModal2] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModal3, setIsOpenModal3] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [projects, setProjects] = useState([]);
-  const [datos, setDatos] = useState([[{id: 1, proceso: "prueba", valor: 30}, {id: 2, proceso: "hola", valor: 50}],
-                                      [{id: 1, proceso: "suministro", valor: 40}, {id: 2, proceso: "suministro2", valor: 60}]]);
+  // Ejemplo para cablear
+  const [datos, setDatos] = useState([[{id: 1, proceso: "prueba", valor: 30}, {id: 2, proceso: "hola", valor: "No"}],
+                                      [{id: 1, proceso: "suministro", valor: "Si"}, {id: 2, proceso: "suministro2", valor: 60}]]);
   const router = useNavigate();
   const { dispatch } = useAuth();
   const { data } = useQuery("projects", () =>
@@ -128,30 +130,40 @@ export default function Process() {
     setIsOpenModal3(false);
   };
 
-  const editProject = (id, currentDesc) => {
-    
-    // Cambiar esto para la integracion en el backend
+  function update(updateValor, id, field){
     for (let index = 0; index < datos[group].length; index++) {
       const element = datos[group][index];
       if(element.id === id){
-        return datos[group][index].proceso = description;
+        if(field === "proceso"){
+          return datos[group][index].proceso = updateValor;
+        }
+        else{
+          return datos[group][index].valor = updateValor;
+        }
+        
       }
     }
+  }
+
+  const editProject = (id, currentDesc) => {
+    update(description, id, "proceso");
   };
 
   const editValor = (id) => {
 
-    if(type >= 0 && type <= 100){
-      //Cambiar esto para la integracion en el backend
-      for (let index = 0; index < datos[group].length; index++) {
-        const element = datos[group][index];
-        if(element.id === id){
-          return datos[group][index].valor = type;
-        }
+    if(isNaN(+type) === isNaN(+oldType)){
+      if(isNaN(+type)){
+        update(type, id, "valor")
+      }
+      else if((type >= 0 && type <= 100) &&  !isNaN(+type)){
+        update(type, id, "valor")
+      }
+      else{
+        alert("el valor debe estar entre 0 y 100")
       }
     }
     else{
-      alert("el valor debe estar entre 0 y 100")
+      alert("los tipos deben de coincidir")
     }
   };
 
@@ -161,9 +173,14 @@ export default function Process() {
 
   const [category, setCategory] = React.useState('');
   const [group, setGroup] = React.useState(0);
+  const [valorAddGroup, setValorAddGroup] = React.useState("")
 
   const handleChange = (event) => {
     setCategory(event.target.value);
+  };
+
+  const handleChangeValor = (event) => {
+    setValorAddGroup(event.target.value);
   };
 
   const handleChangeGroup = (event) => {
@@ -181,6 +198,20 @@ export default function Process() {
               label="Nombre del grupo"
               onChange={handleOnChangeDescription}
             />
+          <FormControl className={styles.selectModal} style={{ marginTop: "20px"}}>
+            <InputLabel id="demo-simple-select-label">Valor</InputLabel>
+            <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={valorAddGroup}
+                label="valorAddGroup"
+                onChange={handleChangeValor}
+            >
+                {/* colocar los procesos que vengan de la base de datos */}
+                <MenuItem value={"cualitativo"}>Cualitativo</MenuItem>
+                <MenuItem value={"cuantitativo"}>Cuantitativo</MenuItem>
+            </Select>
+          </FormControl>
           </div>
           <div className={styles.controls}>
             <Button variant="outlined" onClick={closeModal3}>
@@ -239,6 +270,7 @@ export default function Process() {
                     label="category"
                     onChange={handleChange}
                 >
+                    {/* colocar los procesos que vengan de la base de datos */}
                     <MenuItem value={"Procesos primarios"}>Procesos primarios</MenuItem>
                     <MenuItem value={"Procesos organizacionales"}>Procesos organizacionales</MenuItem>
                     <MenuItem value={"Procesos de soporte"}>Procesos de soporte</MenuItem>
@@ -278,7 +310,7 @@ export default function Process() {
                 <TableRow>
                   <TableCell>Id </TableCell>
                   <TableCell align="center">Proceso</TableCell>
-                  <TableCell align="center">Valor %</TableCell>
+                  <TableCell align="center">Valor</TableCell>
                   <TableCell align="center">Acciones</TableCell>
                 </TableRow>
               </TableHead>
@@ -312,6 +344,7 @@ export default function Process() {
                       )}
                       <div
                           onClick={() => {
+                            setOldType(row.valor)
                             setIsOpenModal2(true);
                             setType(row.valor)
                             setCurrentId(row.id)
