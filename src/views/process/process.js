@@ -43,6 +43,7 @@ export default function Process() {
   const { state } = useAuth();
   const [currentPage, setCurrenPage] = useState(1);
   const [pageCount, setPageCount] = useState(0);
+  const queryClient = useQueryClient();
   const [editable, setEditable] = useState(null);
   const [description, setDescription] = useState("");
   const [type, setType] = useState("Ninguno");
@@ -52,22 +53,33 @@ export default function Process() {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModal3, setIsOpenModal3] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [projects, setProjects] = useState([]);
+  const [process, setProcess] = useState([]);
+  
   // Ejemplo para cablear
-  const [datos, setDatos] = useState([[{id: 1, proceso: "prueba", valor: 30}, {id: 2, proceso: "hola", valor: "No"}],
-                                      [{id: 1, proceso: "suministro", valor: "Si"}, {id: 2, proceso: "suministro2", valor: 60}]]);
+  //const [datos, setDatos] = useState([[{id: 1, proceso: "prueba", valor: 30}, {id: 2, proceso: "hola", valor: "No"}],
+  //                                    [{id: 1, proceso: "suministro", valor: "Si"}, {id: 2, proceso: "suministro2", valor: 60}]]);
   const router = useNavigate();
   const { dispatch } = useAuth();
-  const { data } = useQuery("projects", () =>
-    fetchService({ url: `/projects/getall/${state.id || 1}` })
+
+  /** GET PROCESSES */
+
+  //const { data } = useQuery("projects", () =>
+  //  fetchService({ url: `/projects/getall/${state.id || 1}` })
+  //);
+
+  const { data } = useQuery("process", () => 
+    fetchService({ url: `/process/all` })
   );
 
+
+
+  /** GET PROCESSES */
   useEffect(() => {
     if (data) {
       let filterData = data;
       if (searchValue) {
-        filterData = data.filter((project) =>
-          project.description
+        filterData = data.filter((process) =>
+          process.name
             .toLowerCase()
             .includes(searchValue.toLocaleLowerCase())
         );
@@ -75,13 +87,17 @@ export default function Process() {
       const startData = (currentPage - 1) * 5;
       const endData = startData + 5;
       setPageCount(Math.ceil(filterData.length / 5));
-      setProjects(filterData.reverse().slice(startData, endData));
+      setProcess(filterData.reverse().slice(startData, endData));
     }
   }, [data, currentPage, searchValue]);
 
+
+  /**
   const { mutate: deleteProjectMutation } = useMutation(
     (id) => {
       // se debe hacer un fetch para eliminarlo en la base de datos
+
+      
       for (let index = 0; index < datos[group].length; index++) {
         const element = datos[group][index];
         if(element.id === id){
@@ -90,6 +106,27 @@ export default function Process() {
       }
     },
   );
+  */
+
+  /** Delete process */
+  const { mutate: deleteProcessMutation } = useMutation(
+    (id) => {
+      return fetchService({
+        url: `/process/delete/${id}`,
+        method: "DELETE",
+        token: "",
+      });
+    },
+
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("process");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
+
+
 
   function user() {
     router("/users");
@@ -103,7 +140,7 @@ export default function Process() {
     router("/logger")
   }
 
-  function process(){
+  function routeProcess(){
     router("/process")
   }
 
@@ -131,6 +168,8 @@ export default function Process() {
   };
 
   function update(updateValor, id, field){
+
+    /*
     for (let index = 0; index < datos[group].length; index++) {
       const element = datos[group][index];
       if(element.id === id){
@@ -143,6 +182,7 @@ export default function Process() {
         
       }
     }
+    */
   }
 
   const editProject = (id, currentDesc) => {
@@ -167,9 +207,42 @@ export default function Process() {
     }
   };
 
+  /** ADD PROCESS */
+  const { mutate } = useMutation(
+    (values) => {
+      return fetchService({
+        url: "/process/add",
+        params: {
+          name: values.description,
+          group: values.category,
+          qualitative_value: "QualitativeEnum.unachieved",
+          quantitative_value: 10,
+        },
+        method: "POST",
+        token: "",
+      });
+    },
+    {
+      onSuccess: () => {
+        closeModal();
+        queryClient.invalidateQueries("process");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
+
+  const createProcess = () => {
+    mutate({ description, category });
+  };
+
+  /////////////////////////////////////////
+
+
+
   const onChangeType = ({ target }) => {
     setType(target?.value);
   };
+
 
   const [category, setCategory] = React.useState('');
   const [group, setGroup] = React.useState(0);
@@ -191,6 +264,7 @@ export default function Process() {
     <>
       <div className={styles.container}>
         <h1>Procesos</h1>
+
         <Dialog open={isOpenModal3} onClose={closeModal3}>
           <DialogTitle>Crear nuevo grupo de procesos</DialogTitle>
           <div className={styles.form}>
@@ -234,7 +308,7 @@ export default function Process() {
             <Button variant="outlined" onClick={closeModal}>
               Cancelar
             </Button>
-            <Button variant="contained" onClick={closeModal}>
+            <Button variant="contained" onClick={createProcess}>
               Crear
             </Button>
           </div>
@@ -243,8 +317,10 @@ export default function Process() {
           <DialogTitle>Cambiar valor</DialogTitle>
           <div className={styles.form}>
           <TextField
-              label="valor"
+              label="Valor"
               onChange={onChangeType}
+              type="number"
+              InputProps={{ inputProps: { min: 0, max: 100 } }}
               value = {type}
           />
           </div>
@@ -271,9 +347,9 @@ export default function Process() {
                     onChange={handleChange}
                 >
                     {/* colocar los procesos que vengan de la base de datos */}
-                    <MenuItem value={"Procesos primarios"}>Procesos primarios</MenuItem>
-                    <MenuItem value={"Procesos organizacionales"}>Procesos organizacionales</MenuItem>
-                    <MenuItem value={"Procesos de soporte"}>Procesos de soporte</MenuItem>
+                    <MenuItem value={"Primarios"}>Procesos primarios</MenuItem>
+                    <MenuItem value={"Organizacionales"}>Procesos organizacionales</MenuItem>
+                    <MenuItem value={"Soporte"}>Procesos de soporte</MenuItem>
                 </Select>
             </FormControl>
             <Button variant="text" color="success" onClick={() => { setIsOpenModal(true);}}>
@@ -315,7 +391,7 @@ export default function Process() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {datos[group].map((row) => (
+                {process.map((row) => ( 
                   <TableRow
                     key={row.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -329,24 +405,24 @@ export default function Process() {
                           label=""
                           variant="standard"
                           onChange={handleOnChangeDescription}
-                          defaultValue={row.proceso}
+                          defaultValue={row.name}
                           onKeyDown={(e) => {
                             e.key === "Enter" && editProject(row.id);
                           }}
                         />
                       ) : (
-                        row.proceso
+                        row.name
                       )}
                     </TableCell>
                     <TableCell align="center" style={{width: "11rem"}}>
                       { (
-                        row.valor
+                        row.quantitative_value + "%"
                       )}
                       <div
                           onClick={() => {
-                            setOldType(row.valor)
+                            setOldType(row.quantitative_value)
                             setIsOpenModal2(true);
-                            setType(row.valor)
+                            setType(row.quantitative_value)
                             setCurrentId(row.id)
                           }}
                           style={{ cursor: "pointer", float: "right" }}
@@ -359,15 +435,15 @@ export default function Process() {
                         <div
                           onClick={() => {
                             setEditable(row.id)
-                            setDescription(row.proceso)
-                            setType(row.valor)
+                            setDescription(row.name)
+                            setType(row.quantitative_value)
                           }}
                           style={{ cursor: "pointer" }}
                         >
                           <EditIcon />
                         </div>
                         <div
-                          onClick={() => deleteProjectMutation(row.id)}
+                          onClick={() => deleteProcessMutation(row.id)}
                           style={{ cursor: "pointer" }}
                         >
                           <DeleteIcon />
@@ -381,7 +457,7 @@ export default function Process() {
                           onClick={() => setEditable(false)}
                         >
                           <div
-                            onClick={() => editProject(row.id, row.proceso)}
+                            onClick={() => editProject(row.id, row.name)}
                           >
                             <SaveIcon style={{ color: "green" }} />
                           </div>
@@ -425,7 +501,7 @@ export default function Process() {
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
-            { name: "Procesos", redirect: () => {process()}, icon: <FolderIcon /> },
+            { name: "Procesos", redirect: () => {routeProcess()}, icon: <FolderIcon /> },
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>
