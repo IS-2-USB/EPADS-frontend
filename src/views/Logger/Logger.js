@@ -24,6 +24,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from '@mui/icons-material/Search';
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
+import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import styles from "./logger.module.scss";
 import SearchBar from "../../searchBar";
 import { useNavigate } from "react-router-dom";
@@ -100,6 +101,10 @@ export default function Logger() {
 
   function logger(){
     router("/logger")
+  }
+
+  function quality(){
+    router("/quality")
   }
 
   return (
@@ -222,6 +227,7 @@ export default function Logger() {
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+            { name: "Calidad", redirect: () => {quality()}, icon: <WorkspacePremiumRoundedIcon />},
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>

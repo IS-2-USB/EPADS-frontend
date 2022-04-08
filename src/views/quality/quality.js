@@ -35,6 +35,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
+import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import styles from "./quality.module.scss";
 import SearchBar from "../../searchBar";
 import { useNavigate } from "react-router-dom";
@@ -229,8 +230,8 @@ export default function Quality() {
     }
 ];
 
-  const [selectCar, setSelectCar] = useState(0);
-  const [selectSubCar, setSelectSubCar] = useState(0);
+  const [selectCar, setSelectCar] = useState("");
+  const [selectSubCar, setSelectSubCar] = useState("");
 
 
   const handleSelectChange = (e, func) => {
@@ -256,18 +257,18 @@ export default function Quality() {
                 onChange= {(e) => handleSelectChange(e, setSelectCar)}
               >
             {selectCarOptions.map((option) => (
-              <MenuItem value={option.value}>{option.label}</MenuItem>
+              <MenuItem key={option.id} value={option.value}>{option.label}</MenuItem>
             ))}
               </Select>
         </FormControl>
         <div
-            onClick={() => {
+            /*onClick={() => {
                 setIsOpenModal2(true);
                 setDescription(row.description);
                 setVersion(row.version)
                 setType(row.type)
                 setCurrentId(row.id)
-            }}
+            }}*/
             style={{ cursor: "pointer"}}
             >
             <AddCircleIcon style={{width: "40px", height: "40px"}} />
@@ -286,18 +287,18 @@ export default function Quality() {
                 onChange= {(e) => handleSelectChange(e, setSelectSubCar)}
               >
                {selectSubCarOptions.map((option) => (
-              <MenuItem value={option.value}>{option.label}</MenuItem>
+              <MenuItem key={option.id} value={option.value}>{option.label}</MenuItem>
             ))}
               </Select>
         </FormControl>
         <div
-            onClick={() => {
+            /*onClick={() => {
                 setIsOpenModal2(true);
                 setDescription(row.description);
                 setVersion(row.version)
                 setType(row.type)
                 setCurrentId(row.id)
-            }}
+            }}*/
             style={{ cursor: "pointer"}}
             >
             <AddCircleIcon style={{width: "40px", height: "40px"}} />
@@ -329,11 +330,11 @@ export default function Quality() {
                         <TextField
                           label=""
                           variant="standard"
-                          onChange={handleOnChangeDescription}
+                          /*onChange={handleOnChangeDescription}*/
                           defaultValue={row.description}
-                          onKeyDown={(e) => {
+                          /*onKeyDown={(e) => {
                             e.key === "Enter" && editProject(row.id);
-                          }}
+                          }}*/
                         />
                       ) : (
                         row.description
@@ -349,7 +350,7 @@ export default function Quality() {
                             style={{ height: "40px" }}
                             variant="standard"
                             defaultValue={row.type}
-                            onChange={onChangeType}
+                            /*onChange={onChangeType}*/
                           >
                             <MenuItem value={"Ninguno"}>Ninguno</MenuItem>
                             <MenuItem value={"ISO-IEC 25010"}>
@@ -418,7 +419,7 @@ export default function Quality() {
                           onClick={() => setEditable(false)}
                         >
                           <div
-                            onClick={() => editProject(row.id, row.description)}
+                            /*onClick={() => editProject(row.id, row.description)}*/
                           >
                             <SaveIcon style={{ color: "green" }} />
                           </div>
@@ -457,6 +458,7 @@ export default function Quality() {
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
+            { name: "Calidad", redirect: () => {quality()}, icon: <WorkspacePremiumRoundedIcon />},
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>
