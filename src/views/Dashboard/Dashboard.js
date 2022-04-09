@@ -498,6 +498,12 @@ export default function Dashboard() {
                           <DownloadIcon />
                         </div>
                         <div
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {quality()}}
+                        >
+                          <WorkspacePremiumRoundedIcon />
+                        </div>
+                        <div
                           style={{
                             cursor: "pointer",
                             visibility:
@@ -545,7 +551,6 @@ export default function Dashboard() {
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
-            { name: "Calidad", redirect: () => {quality()}, icon: <WorkspacePremiumRoundedIcon />},
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>
