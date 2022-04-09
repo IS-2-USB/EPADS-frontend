@@ -63,6 +63,7 @@ export default function Quality() {
   const [isOpenModal2, setIsOpenModal2] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [projects, setProjects] = useState([]);
+  const [carTables, setCarTables] = useState([]);
   const router = useNavigate();
   const { data } = useQuery("projects", () =>
     fetchService({ url: `/projects/getall/${state.id || 1}` })
@@ -258,6 +259,12 @@ export default function Quality() {
     console.log(selectCarDict);
   }
 
+  const addCarTable = (car) => {
+    setCarTables(carTables => carTables.concat(car));
+    console.log(car);
+    console.log(carTables);
+  }
+
   return (
     <>
       <div className={styles.container}>
@@ -282,38 +289,8 @@ export default function Quality() {
               </Select>
         </FormControl>
         <div
-            /*onClick={() => {
-                setIsOpenModal2(true);
-                setDescription(row.description);
-                setVersion(row.version)
-                setType(row.type)
-                setCurrentId(row.id)
-            }}*/
-            style={{ cursor: "pointer"}}
-            >
-            <AddCircleIcon style={{width: "40px", height: "40px"}} />
-        </div>
-        </div>
-        <div className={styles.header2}>
-        
-        <FormControl>
-              <InputLabel id="demo-simple-select-label2">{selectCar}</InputLabel>
-              <Select
-                labelId="demo-simple-select-label2"
-                id="demo-simple-select2"
-                value={selectSubCar}
-                style={{ width: "300px" }}
-                label="Tipo2"
-                onChange= {(e) => handleSelectChange(e, setSelectSubCar)}
-              >
-               {selectSubCarOptions.map((option) => (
-              <MenuItem key={option.id} value={option.value}>{option.label}</MenuItem>
-            ))}
-              </Select>
-        </FormControl>
-        <div
             onClick={() => {
-                addSubCar(selectCar, selectSubCar)
+              addCarTable(selectCar)
             }}
             style={{ cursor: "pointer"}}
             >
@@ -321,131 +298,167 @@ export default function Quality() {
         </div>
         </div>
 
+
         <div>
-        <TableContainer component={Paper}>
-<Table sx={{ minWidth: 650 }} aria-label="simple table">
-  <TableHead>
-    <TableRow>
-      <TableCell>Id </TableCell>
-      <TableCell align="center">Sub-característica</TableCell>
-      <TableCell align="center">Valor</TableCell>
-      <TableCell align="center">Acciones</TableCell>
-    </TableRow>
-  </TableHead>
-  <TableBody>
-    {selectCarDict[selectCar]?.map((row) => (
-      <TableRow
-        key={row.id}
-        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-      >
-        <TableCell component="th" scope="row">
-          {row.id}
-        </TableCell>
-        <TableCell align="center">
-          {editable === row.id ? (
-            <TextField
-              label=""
-              variant="standard"
-              /*onChange={handleOnChangeDescription}*/
-              defaultValue={row.name}
-              /*onKeyDown={(e) => {
-                e.key === "Enter" && editProject(row.id);
-              }}*/
-            />
-          ) : (
-            row.name
-          )}
-        </TableCell>
-        <TableCell align="center">
-          {editable === row.id ? (
-            <FormControl className={styles.select}>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={type}
-                style={{ height: "40px" }}
-                variant="standard"
-                defaultValue={row.valor}
-                /*onChange={onChangeType}*/
-              >
-                <MenuItem value={"Ninguno"}>Ninguno</MenuItem>
-                <MenuItem value={"ISO-IEC 25010"}>
-                  ISO-IEC 25010
-                </MenuItem>
-                <MenuItem value={"ISO-IEC 33000"}>
-                  ISO-IEC 33000
-                </MenuItem>
-              </Select>
-            </FormControl>
-          ) : (
-            row.valor
-          )}
-        </TableCell>
-        <TableCell align="center">
-          <div className={styles.icons_row}>
-            <div
+{carTables?.map((table) => (
+      <div style={{marginBottom: "50px"}}>
+
+          <div className={styles.header2}>
+        
+          <FormControl>
+          <InputLabel id="demo-simple-select-label2">{table}</InputLabel>
+                  <Select
+                    id="demo-simple-select2"
+                    labelId="demo-simple-select-label2"
+                    value={selectSubCar}
+                    style={{ width: "300px" }}
+                    label="Tipo2"
+                    onChange= {(e) => handleSelectChange(e, setSelectSubCar)}
+                  >
+                  {selectSubCarOptions.map((option) => (
+                  <MenuItem key={option.id} value={option.value}>{option.label}</MenuItem>
+                ))}
+                  </Select>
+
+
+          </FormControl>
+          <div
               onClick={() => {
-                setIsOpenModal2(true);
-                setDescription(row.name);
-                setType(row.valor)
-                setCurrentId(row.id)
+                  addSubCar(table, selectSubCar)
               }}
-              style={{ cursor: "pointer" }}
-            >
-              <ArticleIcon />
-            </div>
-            {row.status === "active" ? (
-              <div
-                onClick={() => pauseProject({ id: row.id })}
-                style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer"}}
               >
-                <PanToolIcon />
-              </div>
-            ) : (
-              <div
-                onClick={() => reactivateProject({ id: row.id })}
-                style={{ cursor: "pointer" }}
-              >
-                <PlayCircleFilledIcon />
-              </div>
-            )}
-            <div
-              onClick={() => {
-                setEditable(row.id)
-                setDescription(row.name)
-                setType(row.valor)
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <EditIcon />
-            </div>
-            <div
-              onClick={() => deleteProjectMutation(row.id)}
-              style={{ cursor: "pointer" }}
-            >
-              <DeleteIcon />
-            </div>
-            <div
-              style={{
-                cursor: "pointer",
-                visibility:
-                  editable === row.id ? "unset" : "hidden",
-              }}
-              onClick={() => setEditable(false)}
-            >
-              <div
-                /*onClick={() => editProject(row.id, row.description)}*/
-              >
-                <SaveIcon style={{ color: "green" }} />
-              </div>
-            </div>
+              <AddCircleIcon style={{width: "40px", height: "40px"}} />
           </div>
-        </TableCell>
-      </TableRow>
-    ))}
-  </TableBody>
-</Table>
-</TableContainer>
+          </div>
+   <TableContainer component={Paper} className="quality-table">
+        
+   <Table sx={{ minWidth: 650, marginBottom: "50px"}} aria-label="simple table">
+     <TableHead>
+       <TableRow>
+         <TableCell>Id </TableCell>
+         <TableCell align="center">Sub-característica</TableCell>
+         <TableCell align="center">Valor</TableCell>
+         <TableCell align="center">Acciones</TableCell>
+       </TableRow>
+     </TableHead>
+     <TableBody>
+       {selectCarDict[table]?.map((row, index) => (
+         <TableRow
+           key={row.id}
+           sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+         >
+           <TableCell component="th" scope="row">
+             {index}
+           </TableCell>
+           <TableCell align="center">
+             {editable === row.id ? (
+               <TextField
+                 label=""
+                 variant="standard"
+                 /*onChange={handleOnChangeDescription}*/
+                 defaultValue={row.name}
+                 /*onKeyDown={(e) => {
+                   e.key === "Enter" && editProject(row.id);
+                 }}*/
+               />
+             ) : (
+               row.name
+             )}
+           </TableCell>
+           <TableCell align="center">
+             {editable === row.id ? (
+               <FormControl className={styles.select}>
+                 <Select
+                   labelId="demo-simple-select-label"
+                   id="demo-simple-select"
+                   value={type}
+                   style={{ height: "40px" }}
+                   variant="standard"
+                   defaultValue={row.valor}
+                   /*onChange={onChangeType}*/
+                 >
+                   <MenuItem value={"Ninguno"}>Ninguno</MenuItem>
+                   <MenuItem value={"ISO-IEC 25010"}>
+                     ISO-IEC 25010
+                   </MenuItem>
+                   <MenuItem value={"ISO-IEC 33000"}>
+                     ISO-IEC 33000
+                   </MenuItem>
+                 </Select>
+               </FormControl>
+             ) : (
+               row.valor
+             )}
+           </TableCell>
+           <TableCell align="center">
+             <div className={styles.icons_row}>
+               <div
+                 onClick={() => {
+                   setIsOpenModal2(true);
+                   setDescription(row.name);
+                   setType(row.valor)
+                   setCurrentId(row.id)
+                 }}
+                 style={{ cursor: "pointer" }}
+               >
+                 <ArticleIcon />
+               </div>
+               {row.status === "active" ? (
+                 <div
+                   onClick={() => pauseProject({ id: row.id })}
+                   style={{ cursor: "pointer" }}
+                 >
+                   <PanToolIcon />
+                 </div>
+               ) : (
+                 <div
+                   onClick={() => reactivateProject({ id: row.id })}
+                   style={{ cursor: "pointer" }}
+                 >
+                   <PlayCircleFilledIcon />
+                 </div>
+               )}
+               <div
+                 onClick={() => {
+                   setEditable(row.id)
+                   setDescription(row.name)
+                   setType(row.valor)
+                 }}
+                 style={{ cursor: "pointer" }}
+               >
+                 <EditIcon />
+               </div>
+               <div
+                 onClick={() => deleteProjectMutation(row.id)}
+                 style={{ cursor: "pointer" }}
+               >
+                 <DeleteIcon />
+               </div>
+               <div
+                 style={{
+                   cursor: "pointer",
+                   visibility:
+                     editable === row.id ? "unset" : "hidden",
+                 }}
+                 onClick={() => setEditable(false)}
+               >
+                 <div
+                   /*onClick={() => editProject(row.id, row.description)}*/
+                 >
+                   <SaveIcon style={{ color: "green" }} />
+                 </div>
+               </div>
+             </div>
+           </TableCell>
+         </TableRow>
+       ))}
+     </TableBody>
+   </Table>
+   </TableContainer>
+   </div>
+   ))} 
+
           <div className={styles.paginationContainer}>
             <Pagination
               count={pageCount}
