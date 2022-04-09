@@ -221,35 +221,35 @@ export default function Quality() {
         value: "Satisfacción",
         id: 2,
     },
-];
+  ];
 
-  let selectSubCarDict = {"Efectividad" : {name: "Efectividad", id:0, valor: "50%"}, "Eficiencia" : {name: "Eficiencia", id:1, valor:"100%"}, "Confianza" : {name: "Confianza", id:2, valor:"30%"},
-                          "Cumplimiento" : {name: "Cumplimiento", id:3, valor:"30%"}};
+  let selectSubCarDict = {"Efectividad" : {name: "Efectividad", id:0, valor: ""}, "Eficiencia" : {name: "Eficiencia", id:1, valor:""}, "Confianza" : {name: "Confianza", id:2, valor:""},
+                          "Cumplimiento" : {name: "Cumplimiento", id:3, valor:""}};
 
   const selectSubCarOptions = [
     {
         label: "Efectividad",
         value: "Efectividad",
         id: 0,
-        valor: "50%",
+        valor: "",
     },
     {
         label: "Eficiencia",
         value: "Eficiencia",
         id: 1,
-        valor: "100%",
+        valor: "",
     },
     {
        label: "Confianza",
        value: "Confianza",
        id: 2,
-        valor: "30%",
+        valor: "",
     },
     {
         label: "Cumplimiento",
         value: "Cumplimiento",
         id: 3,
-        valor: "70%",
+        valor: "",
     },
   ];
 
@@ -275,6 +275,20 @@ export default function Quality() {
     setCarTables(carTables => carTables.concat(car));
     console.log(car);
     console.log(carTables);
+  }
+
+  const handleValueChange = (e, car, index) => {
+    selectCarDict[car][index]["valor"] = e.target.value; 
+    console.log(e.target.value);
+  }
+
+  const handleSubCarDelete = (e, car, index) => {
+    
+    setSelectCarDict(selectCarDict => ({
+      ...selectCarDict,
+      [car]: selectCarDict[car].splice(index,1),
+    }));
+    console.log(selectCarDict);
   }
 
   return (
@@ -364,41 +378,19 @@ export default function Quality() {
              {index}
            </TableCell>
            <TableCell align="center">
-             {editable === row.id ? (
-               <TextField
-                 label=""
-                 variant="standard"
-                 /*onChange={handleOnChangeDescription}*/
-                 defaultValue={row.name}
-                 /*onKeyDown={(e) => {
-                   e.key === "Enter" && editProject(row.id);
-                 }}*/
-               />
-             ) : (
-               row.name
-             )}
+            {row.name}
            </TableCell>
            <TableCell align="center">
              {editable === row.id ? (
-               <FormControl className={styles.select}>
-                 <Select
-                   labelId="demo-simple-select-label"
-                   id="demo-simple-select"
-                   value={type}
-                   style={{ height: "40px" }}
-                   variant="standard"
-                   defaultValue={row.valor}
-                   /*onChange={onChangeType}*/
-                 >
-                   <MenuItem value={"Ninguno"}>Ninguno</MenuItem>
-                   <MenuItem value={"ISO-IEC 25010"}>
-                     ISO-IEC 25010
-                   </MenuItem>
-                   <MenuItem value={"ISO-IEC 33000"}>
-                     ISO-IEC 33000
-                   </MenuItem>
-                 </Select>
-               </FormControl>
+                <TextField
+                label=""
+                variant="standard"
+                onChange={(e) => handleValueChange(e,table,index)}
+                defaultValue={row.valor}
+                /*onKeyDown={(e) => {
+                  e.key === "Enter" && editProject(row.id);
+                }}*/
+              />
              ) : (
                row.valor
              )}
@@ -442,7 +434,7 @@ export default function Quality() {
                  <EditIcon />
                </div>
                <div
-                 onClick={() => deleteProjectMutation(row.id)}
+                 onClick={(e) => handleSubCarDelete(e, table, index)}
                  style={{ cursor: "pointer" }}
                >
                  <DeleteIcon />
