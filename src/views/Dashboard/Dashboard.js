@@ -29,6 +29,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ArticleIcon from '@mui/icons-material/Article';
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
+import MouseIcon from "@mui/icons-material/Mouse";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -192,6 +193,10 @@ export default function Dashboard() {
 
   function quality(){
     router("/quality")
+  }
+
+  function usability(){
+    router("/usability")
   }
 
   const createProject = () => {
@@ -502,6 +507,12 @@ export default function Dashboard() {
                           onClick={() => {quality()}}
                         >
                           <WorkspacePremiumRoundedIcon />
+                        </div>
+                        <div
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {usability()}}
+                        >
+                          <MouseIcon />
                         </div>
                         <div
                           style={{
