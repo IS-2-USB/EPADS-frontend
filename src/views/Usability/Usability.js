@@ -327,7 +327,7 @@ export default function Quality() {
 
         <div>
 {carTables?.map((table) => (
-      <div style={{marginBottom: "50px"}}>
+      <div key={carTables.id} style={{marginBottom: "50px"}}>
 
           <div className={styles.header2}>
         
