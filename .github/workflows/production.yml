@@ -25,4 +25,3 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "epads-prod"
           heroku_email: "benitez4721@gmail.com"
-          dontuseforce: 0
