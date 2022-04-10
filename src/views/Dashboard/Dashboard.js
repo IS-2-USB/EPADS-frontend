@@ -29,11 +29,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import ArticleIcon from '@mui/icons-material/Article';
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
+import MouseIcon from "@mui/icons-material/Mouse";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
+import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import styles from "./dashboard.module.scss";
 import SearchBar from "../../searchBar";
 import { useNavigate } from "react-router-dom";
@@ -187,6 +189,14 @@ export default function Dashboard() {
 
   function logger(){
     router("/logger")
+  }
+
+  function quality(){
+    router("/quality")
+  }
+
+  function usability(){
+    router("/usability")
   }
 
   const createProject = () => {
@@ -491,6 +501,18 @@ export default function Dashboard() {
                           style={{ cursor: "pointer" }}
                         >
                           <DownloadIcon />
+                        </div>
+                        <div
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {quality()}}
+                        >
+                          <WorkspacePremiumRoundedIcon />
+                        </div>
+                        <div
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {usability()}}
+                        >
+                          <MouseIcon />
                         </div>
                         <div
                           style={{

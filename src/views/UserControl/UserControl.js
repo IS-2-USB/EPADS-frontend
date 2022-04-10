@@ -30,6 +30,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
+import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import styles from "./userControl.module.scss";
 import { useNavigate } from "react-router-dom";
 import { Users } from "../../api/resources/users";
@@ -110,6 +111,10 @@ export default function UserControl() {
     function logger(){
         router("/logger")
     }
+
+    function quality(){
+        router("/quality")
+      }
     
     const createUser = async () => {
         await Users.register(newUserData);
