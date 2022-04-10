@@ -1,6 +1,7 @@
 {
   "name": "epads-frontend",
   "version": "0.1.0",
+  "homepage": "https://epads-dev.herokuapp.com/",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.8.1",

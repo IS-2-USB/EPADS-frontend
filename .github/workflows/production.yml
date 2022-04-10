@@ -1,16 +1,16 @@
-name: Development workflow
+name: Production workflow
 
 on:
   push:
     branches:
-      - development
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Development Code
+      - name: Production Code
         uses: actions/checkout@v2
       - name: Use Node.js 17.x
         uses: actions/setup-node@v1
@@ -23,6 +23,6 @@ jobs:
         with:
           args: deploy --dir=build --prod
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "epads-dev"
+          heroku_app_name: "epads-prod"
           heroku_email: "benitez4721@gmail.com"
           remote_branch: "master"
