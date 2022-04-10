@@ -4,6 +4,8 @@ import UserControl from "./views/UserControl/UserControl.js";
 import Login from "./views/login/Login.js";
 import Logger from "./views/Logger/Logger.js"
 import SignUp from "./views/signUp/signUp.js";
+import Quality from "./views/quality/quality.js";
+import Usability from "./views/Usability/Usability.js";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/authContext";
 import { ThemeProvider } from "@emotion/react";
@@ -40,6 +42,20 @@ function App() {
                 path="/logger"
                 element={
                   <PrivateRoute redirectTo="/" Component={Logger} />
+                }
+              />
+              <Route
+                exact
+                path="/quality"
+                element={
+                  <PrivateRoute redirectTo="/" Component={Quality} />
+                }
+              />
+              <Route
+                exact
+                path="/usability"
+                element={
+                  <PrivateRoute redirectTo="/" Component={Usability} />
                 }
               />
             </Routes>
