@@ -25,6 +25,7 @@ import {
 } from "@mui/material";
 import PanToolIcon from "@mui/icons-material/PanTool";
 import EditIcon from "@mui/icons-material/Edit";
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -509,7 +510,7 @@ export default function UserControl() {
                         { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
                         { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
                         { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
-                        { name: "Procesos", redirect: () => {process()}, icon: <FolderIcon /> },
+                        { name: "Procesos", redirect: () => {process()}, icon: <AccountTreeIcon /> },
                     ].map(({ name, redirect, icon }, index) => (
                         <ListItem button onClick={redirect} key={name}>
                         <ListItemIcon>{icon}</ListItemIcon>

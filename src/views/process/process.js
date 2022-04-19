@@ -32,6 +32,10 @@ import PeopleIcon from "@mui/icons-material/People";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SaveIcon from "@mui/icons-material/Save";
+
+import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+
 import styles from "./process.module.scss";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -43,8 +47,15 @@ export default function Process() {
   const { state } = useAuth();
   const [currentPage, setCurrenPage] = useState(1);
   const [pageCount, setPageCount] = useState(0);
+  const queryClient = useQueryClient();
   const [editable, setEditable] = useState(null);
+
   const [description, setDescription] = useState("");
+  const [value, setValue] = useState(100);
+  const [projectId, setProjectId] = useState(1);
+  const [groups, setGroups] = useState([]);
+  const [currentGroup, setCurrentGroup] = useState(1)
+
   const [type, setType] = useState("Ninguno");
   const [oldType, setOldType] = useState("Ninguno");
   const [currentId, setCurrentId] = useState(0);
@@ -52,53 +63,68 @@ export default function Process() {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModal3, setIsOpenModal3] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [projects, setProjects] = useState([]);
-
-
-  /* Process data */
-  const [datos, setDatos] = useState([[{id: 1, proceso: "Acuerdo de Contrato", valor: 100}, {id: 2, proceso: "Monitoreo de Proveedores", valor: 80}, {id: 3, proceso: "Requisitos Técnicos", valor: 100}],
-                                      [{id: 1, proceso: "Requisitos Legales", valor: 100}, {id: 2, proceso: "Requisitos de Proveedores", valor: 60}],
-                                      [{id: 1, proceso: "Solicitud de Propuestas", valor: 100}, {id: 2, proceso: "Calificación del Proveedor", valor: 70}] ]);
-
-  /** Ejemplo para cablear
-  const [datos, setDatos] = useState([[{id: 1, proceso: "prueba", valor: 30}, {id: 2, proceso: "hola", valor: "No"}],
-                                      [{id: 1, proceso: "suministro", valor: "Si"}, {id: 2, proceso: "suministro2", valor: 60}]]);
-    */
+  const [processes, setProcesses] = useState([]);
 
   const router = useNavigate();
   const { dispatch } = useAuth();
-  const { data } = useQuery("projects", () =>
-    fetchService({ url: `/projects/getall/${state.id || 1}` })
+  
+  const { data } = useQuery("processes", () => 
+    fetchService({ url: `/processes/getall/${projectId}` })
   );
+
+  const { groupData } = useQuery("groups", () =>
+    fetchService({ url: `/processes/groups/getall` })
+  );
+
+  
+  /** Get groups */
+  const fetchGroupData = async () => {
+    return fetch("http://localhost:5000/processes/groups/getall")
+          .then((response) => {return response.json()} )
+          .then((data) => { setGroups(Array.from(data)) }  )}
 
   useEffect(() => {
     if (data) {
       let filterData = data;
       if (searchValue) {
-        filterData = data.filter((project) =>
-          project.description
+        filterData = data.filter((process) => { 
+          process.name
             .toLowerCase()
             .includes(searchValue.toLocaleLowerCase())
+          }
         );
       }
-      const startData = (currentPage - 1) * 5;
-      const endData = startData + 5;
-      setPageCount(Math.ceil(filterData.length / 5));
-      setProjects(filterData.reverse().slice(startData, endData));
+
+      //const startData = (currentPage - 1) * 5;
+      //const endData = startData + 5;
+      //setPageCount(Math.ceil(filterData.length / 5));
+      //setProcesses(filterData.slice(startData, endData));
+      setProcesses(filterData)
+      
+      /** Get group data */
+      const group_data = fetchGroupData();
+      setGroups(Array.from(group_data));
     }
   }, [data, currentPage, searchValue]);
+
+
 
   /** Delete process */
   const { mutate: deleteProcessMutation } = useMutation(
     (id) => {
-      // se debe hacer un fetch para eliminarlo en la base de datos
-      for (let index = 0; index < datos[category].length; index++) {
-        const element = datos[category][index];
-        if(element.id === id){
-          return datos[category].splice(index, 1);
-        }
-      }
+      return fetchService({
+        url: `/processes/delete/${id}`,
+        method: "DELETE",
+        token: "",
+      });
     },
+
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("processes");
+      },
+      onError: (error) => console.log(error),
+    }
   );
 
   function user() {
@@ -126,6 +152,7 @@ export default function Process() {
 
   const handleOnChangeDescription = (e) => {
     setDescription(e.target.value);
+    setNewProcessName(e.target.value);
   };
 
   const closeModal = () => {
@@ -140,43 +167,80 @@ export default function Process() {
     setIsOpenModal3(false);
   };
 
+
+  /** Create process */
+  const { mutate } = useMutation(
+    (values) => {
+      return fetchService({
+        url: "/processes/add",
+        params: {
+          name: values.description,
+          category: categoryName,
+          value: values.value,
+          group_id: currentGroup,
+          project_id: 1,
+        },
+        method: "POST",
+        token: "",
+      });
+    },
+    {
+      onSuccess: () => {
+        closeModal();
+        queryClient.invalidateQueries("processes");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
+
+
   /** Create process */
   function createProcess() {
-      let index = datos[category].length + 1;
-
-      datos[category].splice(index, 0, {id: index, proceso: description, valor: 100})
+      mutate({ description, categoryName, value, currentGroup, projectId });
       setDescription("")
   }
 
-  /** Update process */
-  function update(updateValor, id, field){
-    for (let index = 0; index < datos[category].length; index++) {
-      const element = datos[category][index];
-      if(element.id === id){
-        if(field === "proceso"){
-          return datos[category][index].proceso = updateValor;
-        }
-        else{
-          return datos[category][index].valor = updateValor;
-        }
-        
-      }
-    }
-  }
 
-  const editProject = (id, currentDesc) => {
-    update(description, id, "proceso");
-    setDescription("")
+  /** Update process */
+  const { mutate: updateProcessMutation } = useMutation(
+    ({ id, description }) => {
+      return fetchService({
+        url: `/processes/update/${id}`,
+        method: "PUT",
+        params: {
+          name: description,
+          value: type,
+        },
+        token: "",
+      });
+    },
+
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("processes");
+      },
+      onError: (error) => console.log(error),
+
+    }
+  );
+
+  /** editProcess: Updates the name of the process */
+  const editProcess = (id, currentDesc) => {
+    updateProcessMutation({id, description: newProcessName || currentDesc});
+    setDescription("");
+    setNewProcessName("");
   };
 
-  const editValor = (id) => {
-
+  /** editValue: Updates the value of the process */
+  const editValue = (id) => {
     if(isNaN(+type) === isNaN(+oldType)){
       if(isNaN(+type)){
-        update(type, id, "valor")
+        updateProcessMutation({id, description: newProcessName})
+        setNewProcessName("")
       }
       else if((type >= 0 && type <= 100) &&  !isNaN(+type)){
-        update(type, id, "valor")
+        updateProcessMutation({id, description: newProcessName})
+        setNewProcessName("")
       }
       else{
         alert("El valor debe estar entre 0 y 100")
@@ -187,27 +251,61 @@ export default function Process() {
     }
   };
 
+  /** Create group */
+  const { mutate: createGroupMutation } = useMutation(
+    (values) => {
+      return fetchService({
+        url: "/processes/groups/add",
+        params: {
+          name: description,
+        },
+        method: "POST",
+        token: "",
+      });
+    },
+    {
+      onSuccess: () => {
+        closeModal();
+        queryClient.invalidateQueries("groups");
+      },
+      onError: (error) => console.log(error),
+    }
+  );
+
+  /** Create group */
+  const createGroup = () => {
+    createGroupMutation({ description });
+    setDescription("");
+  };
+
 
   const onChangeType = ({ target }) => {
     setType(target?.value);
   };
 
   const [category, setCategory] = React.useState(0);
+  const [categoryName, setCategoryName] = React.useState("Primarios");
+  const [newProcessName, setNewProcessName] = React.useState("");
   //const [group, setGroup] = React.useState(0);
   const [valorAddGroup, setValorAddGroup] = React.useState("");
 
   const [group, setGroup] = React.useState(["Adquisición", "Suministro"])
-  const [currentGroup, setCurrentGroup] = React.useState(group[0])
 
-  /* Add new group to list */
+  /* Add new group to list
   function createGroup() {
     let index = group.length + 1
     group.splice(index, 0, description)
     setDescription("")
   }
+  */
 
+  /** handleChange: When the processes' category is changed */ 
   const handleChange = (event) => {
     setCategory(event.target.value);
+
+    if (event.target.value == 0) setCategoryName("Primarios");
+    if (event.target.value == 1) setCategoryName("Organizacionales");
+    if (event.target.value == 2) setCategoryName("Soporte");
   };
 
   const handleChangeValor = (event) => {
@@ -307,7 +405,7 @@ export default function Process() {
               Cancelar
             </Button>
             <Button variant="contained" onClick={() => { 
-              editValor(currentId);
+              editValue(currentId);
               closeModal2();
             }}>
               Guardar
@@ -356,9 +454,9 @@ export default function Process() {
                     */}
 
                     <Select value={currentGroup} onChange={handleChangeGroup}>
-                        {group?.map(element => {
+                        {groups?.map(element => {
                             return (
-                                <MenuItem key={element} value={element}>{element}</MenuItem>
+                                <MenuItem key={element.id} value={element.id}>{element.name}</MenuItem>
                             )
                         })}
                     </Select>
@@ -381,7 +479,9 @@ export default function Process() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {datos[category].map((row) => (
+                {processes
+                .filter(process => process.category == categoryName && process.group_id == currentGroup)
+                .map((row) => (
                   <TableRow
                     key={row.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -395,25 +495,26 @@ export default function Process() {
                           label=""
                           variant="standard"
                           onChange={handleOnChangeDescription}
-                          defaultValue={row.proceso}
+                          defaultValue={row.name}
                           onKeyDown={(e) => {
-                            e.key === "Enter" && editProject(row.id);
+                            e.key === "Enter" && editProcess(row.id);
                           }}
                         />
                       ) : (
-                        row.proceso
+                        row.name
                       )}
                     </TableCell>
                     <TableCell align="center" style={{width: "11rem"}}>
                       { (
-                        row.valor + "%"
+                        row.value + "%"
                       )}
                       <div
                           onClick={() => {
-                            setOldType(row.valor)
+                            setOldType(row.value)
                             setIsOpenModal2(true);
-                            setType(row.valor)
+                            setType(row.value)
                             setCurrentId(row.id)
+                            setNewProcessName(row.name)
                           }}
                           style={{ cursor: "pointer", float: "right" }}
                         >
@@ -425,8 +526,8 @@ export default function Process() {
                         <div
                           onClick={() => {
                             setEditable(row.id)
-                            setDescription(row.proceso)
-                            setType(row.valor)
+                            setDescription(row.name)
+                            setType(row.value)
                           }}
                           style={{ cursor: "pointer" }}
                         >
@@ -447,7 +548,7 @@ export default function Process() {
                           onClick={() => setEditable(false)}
                         >
                           <div
-                            onClick={() => editProject(row.id, row.proceso)}
+                            onClick={() => editProcess(row.id, row.name)}
                           >
                             <SaveIcon style={{ color: "green" }} />
                           </div>
@@ -491,7 +592,8 @@ export default function Process() {
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
-            { name: "Procesos", redirect: () => {process()}, icon: <FolderIcon /> },
+            { name: "Calidad", redirect: () => {process()}, icon: <WorkspacePremiumRoundedIcon />},
+            { name: "Procesos", redirect: () => {process()}, icon: <AccountTreeIcon /> },
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>

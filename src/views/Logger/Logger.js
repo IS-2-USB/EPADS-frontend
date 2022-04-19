@@ -20,6 +20,7 @@ import {
   Toolbar,
 } from "@mui/material";
 import EventNoteIcon from "@mui/icons-material/EventNote";
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from '@mui/icons-material/Search';
 import FolderIcon from "@mui/icons-material/Folder";
@@ -240,7 +241,7 @@ export default function Logger() {
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
-            { name: "Procesos", redirect: () => {process()}, icon: <FolderIcon /> },
+            { name: "Procesos", redirect: () => {process()}, icon: <AccountTreeIcon /> },
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>

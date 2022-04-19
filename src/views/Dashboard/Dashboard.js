@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 import PanToolIcon from "@mui/icons-material/PanTool";
 import EditIcon from "@mui/icons-material/Edit";
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ArticleIcon from '@mui/icons-material/Article';
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
@@ -558,7 +559,7 @@ export default function Dashboard() {
             { name: "Proyectos", redirect: () => {dash()}, icon: <FolderIcon /> },
             { name: "Usuarios", redirect: () => {user()}, icon: <PeopleIcon /> },
             { name: "Eventos", redirect: () => {logger()}, icon: <EventNoteIcon /> },
-            { name: "Procesos", redirect: () => {process()}, icon: <FolderIcon /> },
+            { name: "Procesos", redirect: () => {process()}, icon: <AccountTreeIcon /> },
           ].map(({ name, redirect, icon }, index) => (
             <ListItem button onClick={redirect} key={name}>
               <ListItemIcon>{icon}</ListItemIcon>
