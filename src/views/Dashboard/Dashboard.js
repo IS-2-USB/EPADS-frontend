@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Button,
   Dialog,
@@ -35,6 +36,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import SaveIcon from "@mui/icons-material/Save";
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import styles from "./dashboard.module.scss";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SearchBar from "../../searchBar";
@@ -42,6 +44,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { fetchService } from "../../services/api";
 import { useAuth } from "../../context/authContext";
+import MyDocument from '../pdf/pdf_procesos'
 const drawerWidth = 200;
 
 export default function Dashboard() {
@@ -59,6 +62,7 @@ export default function Dashboard() {
   const [type, setType] = useState("Ninguno");
   const [representation, setRepresentation] = useState("");
   const [currentId, setCurrentId] = useState(0);
+  const [currentProjectProcessData, setCurrentProjectProcessData] = useState({});
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModal2, setIsOpenModal2] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -502,9 +506,20 @@ export default function Dashboard() {
                           <DeleteIcon />
                         </div>
                         <div
+                          onClick={() => {
+                            axios.get(`http://127.0.0.1:5000/projects/processes/${row.id}`)
+                            .then(function (response) {
+                              console.log(response.data);
+                              setCurrentProjectProcessData(response.data);
+                            })
+                          }}
                           style={{ cursor: "pointer" }}
                         >
-                          <DownloadIcon />
+                          <PDFDownloadLink document={<MyDocument data={currentProjectProcessData}/>} fileName="process_info.pdf">
+                              {({ blob, url, loading, error }) =>
+                                  <DownloadIcon />
+                              }
+                          </PDFDownloadLink>
                         </div>
                         <div
                           style={{
